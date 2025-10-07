@@ -37,8 +37,8 @@ export async function GET(
     // Parse pagination
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
-    const sortBy = (searchParams.get('sortBy') || 'createdAt') as any;
-    const sortOrder = (searchParams.get('sortOrder') || 'desc') as any;
+    const sortBy = (searchParams.get('sortBy') || 'createdAt') as 'name' | 'priceEur' | 'year' | 'kmNumber' | 'createdAt';
+    const sortOrder = (searchParams.get('sortOrder') || 'desc') as 'asc' | 'desc';
 
     const cars = await getCarsByCategory(categoryEnum, {
       page,

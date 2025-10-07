@@ -8,11 +8,12 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import type { Adapter } from 'next-auth/adapters';
 
 const prisma = new PrismaClient();
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma) as any,
+  adapter: PrismaAdapter(prisma) as Adapter,
   providers: [
     CredentialsProvider({
       name: 'credentials',
@@ -36,7 +37,7 @@ export const authOptions: NextAuthOptions = {
 
           const isPasswordValid = await bcrypt.compare(
             credentials.password,
-            user.password
+            user.password || ''
           );
 
           if (!isPasswordValid) {
@@ -46,27 +47,27 @@ export const authOptions: NextAuthOptions = {
           // Update last login
           await prisma.user.update({
             where: { id: user.id },
-            data: { lastLoginAt: new Date() }
+            data: { lastLogin: new Date() }
           });
 
-          // Log the login activity
-          await prisma.activityLog.create({
-            data: {
-              userId: user.id,
-              action: 'USER_LOGIN',
-              entity: 'user',
-              entityId: user.id,
-              metadata: {
-                email: user.email,
-                timestamp: new Date().toISOString()
-              }
-            }
-          });
+          // TODO: Log the login activity when ActivityLog model is available
+          // await prisma.activityLog.create({
+          //   data: {
+          //     userId: user.id,
+          //     action: 'USER_LOGIN',
+          //     entity: 'user',
+          //     entityId: user.id,
+          //     metadata: {
+          //       email: user.email,
+          //       timestamp: new Date().toISOString()
+          //     } as any
+          //   }
+          // });
 
           return {
             id: user.id,
             email: user.email,
-            name: user.name,
+            name: user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username,
             role: user.role,
           };
         } catch (error) {
@@ -116,9 +117,11 @@ declare module 'next-auth' {
   interface Session {
     user: {
       id: string;
-      email: string;
-      name?: string | null;
       role: string;
+    } & {
+      name?: string | null;
+      email?: string | null;
+      image?: string | null;
     };
   }
 }

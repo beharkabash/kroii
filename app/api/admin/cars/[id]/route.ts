@@ -6,7 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/lib/auth';
-import { PrismaClient, CarStatus, CarCondition, CarCategory, FuelType, TransmissionType, DriveType } from '@prisma/client';
+import { PrismaClient, CarStatus, CarCategory } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -67,13 +67,6 @@ export async function GET(
         },
         specifications: {
           orderBy: { order: 'asc' }
-        },
-        inquiries: {
-          include: {
-            car: true
-          },
-          orderBy: { createdAt: 'desc' },
-          take: 5
         },
         views: {
           orderBy: { createdAt: 'desc' },
@@ -167,15 +160,15 @@ export async function PUT(
       model: data.model,
       year: parseInt(data.year),
       priceEur: parseInt(data.priceEur),
-      fuel: data.fuel as FuelType,
-      transmission: data.transmission as TransmissionType,
+      fuel: data.fuel,
+      transmission: data.transmission,
       kmNumber: parseInt(data.kmNumber) || 0,
       color: data.color || null,
-      driveType: data.driveType ? (data.driveType as DriveType) : null,
+      driveType: data.driveType || null,
       engineSize: data.engineSize || null,
       power: data.power ? parseInt(data.power) : null,
       status: data.status as CarStatus,
-      condition: data.condition as CarCondition,
+      condition: data.condition || null,
       category: data.category as CarCategory,
       featured: Boolean(data.featured),
       description: data.description,
@@ -199,7 +192,7 @@ export async function PUT(
 
           // Create new images
           images: {
-            create: (data.images || []).map((img: any, index: number) => ({
+            create: (data.images || []).map((img: { url: string; altText?: string; isPrimary?: boolean }, index: number) => ({
               url: img.url,
               altText: img.altText || carData.name,
               order: index,
@@ -217,7 +210,7 @@ export async function PUT(
 
           // Create new specifications
           specifications: {
-            create: (data.specifications || []).map((spec: any, index: number) => ({
+            create: (data.specifications || []).map((spec: { label: string; value: string }, index: number) => ({
               label: spec.label,
               value: spec.value,
               order: index,
@@ -233,33 +226,34 @@ export async function PUT(
     });
 
     // Log the activity
-    await prisma.activityLog.create({
-      data: {
-        userId: session.user.id,
-        action: 'CAR_UPDATED',
-        entity: 'car',
-        entityId: updatedCar.id,
-        metadata: {
-          carName: updatedCar.name,
-          changes: {
-            from: {
-              brand: existingCar.brand,
-              model: existingCar.model,
-              year: existingCar.year,
-              price: existingCar.priceEur,
-              status: existingCar.status,
-            },
-            to: {
-              brand: updatedCar.brand,
-              model: updatedCar.model,
-              year: updatedCar.year,
-              price: updatedCar.priceEur,
-              status: updatedCar.status,
-            }
-          }
-        }
-      }
-    });
+    // Note: activityLog table not available yet
+    // await prisma.activityLog.create({
+    //   data: {
+    //     userId: session.user.id,
+    //     action: 'CAR_UPDATED',
+    //     entity: 'car',
+    //     entityId: updatedCar.id,
+    //     metadata: {
+    //       carName: updatedCar.name,
+    //       changes: {
+    //         from: {
+    //           brand: existingCar.brand,
+    //           model: existingCar.model,
+    //           year: existingCar.year,
+    //           price: existingCar.priceEur,
+    //           status: existingCar.status,
+    //         },
+    //         to: {
+    //           brand: updatedCar.brand,
+    //           model: updatedCar.model,
+    //           year: updatedCar.year,
+    //           price: updatedCar.priceEur,
+    //           status: updatedCar.status,
+    //         }
+    //       }
+    //     }
+    //   }
+    // });
 
     return NextResponse.json({
       success: true,
@@ -305,10 +299,7 @@ export async function DELETE(
 
     // Check if car exists
     const existingCar = await prisma.car.findUnique({
-      where: { id },
-      include: {
-        inquiries: true,
-      }
+      where: { id }
     });
 
     if (!existingCar) {
@@ -318,16 +309,16 @@ export async function DELETE(
       );
     }
 
-    // Check if car has inquiries
-    if (existingCar.inquiries.length > 0) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Cannot delete car with existing inquiries. Archive it instead.'
-        },
-        { status: 400 }
-      );
-    }
+    // Note: Inquiry check temporarily disabled (inquiries table not available)
+    // if (existingCar.inquiries?.length > 0) {
+    //   return NextResponse.json(
+    //     {
+    //       success: false,
+    //       error: 'Cannot delete car with existing inquiries. Archive it instead.'
+    //     },
+    //     { status: 400 }
+    //   );
+    // }
 
     // Delete car (related records will be deleted via CASCADE)
     await prisma.car.delete({
@@ -335,21 +326,22 @@ export async function DELETE(
     });
 
     // Log the activity
-    await prisma.activityLog.create({
-      data: {
-        userId: session.user.id,
-        action: 'CAR_DELETED',
-        entity: 'car',
-        entityId: id,
-        metadata: {
-          carName: existingCar.name,
-          brand: existingCar.brand,
-          model: existingCar.model,
-          year: existingCar.year,
-          price: existingCar.priceEur,
-        }
-      }
-    });
+    // Note: activityLog table not available yet
+    // await prisma.activityLog.create({
+    //   data: {
+    //     userId: session.user.id,
+    //     action: 'CAR_DELETED',
+    //     entity: 'car',
+    //     entityId: id,
+    //     metadata: {
+    //       carName: existingCar.name,
+    //       brand: existingCar.brand,
+    //       model: existingCar.model,
+    //       year: existingCar.year,
+    //       price: existingCar.priceEur,
+    //     }
+    //   }
+    // });
 
     return NextResponse.json({
       success: true,

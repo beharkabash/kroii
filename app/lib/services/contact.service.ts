@@ -3,9 +3,9 @@
  * Handles contact form submissions and lead management
  */
 
-import { prisma } from '@/app/lib/db/prisma';
-import { redis } from '@/app/lib/db/redis';
-import { ContactSubmission, LeadStatus, LeadPriority, ActivityType, Prisma } from '@prisma/client';
+import { PrismaClient, ContactSubmission, LeadStatus, LeadPriority, ActivityType, Prisma } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export interface CreateContactInput {
   name: string;
@@ -61,8 +61,8 @@ export async function createContactSubmission(input: CreateContactInput): Promis
     // Log activity
     await logActivity(contact.id, ActivityType.EMAIL_SENT, 'Contact form submitted');
 
-    // Invalidate cache
-    await redis.delPattern('contacts:*');
+    // TODO: Invalidate cache when redis is properly configured
+    // await redis.delPattern('contacts:*');
 
     return contact;
   } catch (error) {
@@ -208,8 +208,8 @@ export async function updateContact(input: UpdateContactInput) {
       await logActivity(id, ActivityType.STATUS_CHANGED, `Status changed to ${data.status}`);
     }
 
-    // Invalidate cache
-    await redis.delPattern('contacts:*');
+    // TODO: Invalidate cache when redis is properly configured
+    // await redis.delPattern('contacts:*');
 
     return contact;
   } catch (error) {

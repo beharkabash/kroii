@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function Home() {
   // Fetch cars from database with fallback for missing DATABASE_URL
-  let cars = [];
+  let cars: ReturnType<typeof convertToLegacyFormat>[] = [];
 
   try {
     // Only try to fetch if DATABASE_URL is available

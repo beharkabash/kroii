@@ -11,19 +11,13 @@ import { motion } from 'framer-motion';
 import {
   MessageSquare,
   Search,
-  Filter,
   Phone,
   Mail,
   Car,
-  Calendar,
   Clock,
   Star,
   TrendingUp,
-  User,
-  CheckCircle,
-  AlertCircle,
   Eye,
-  MessageCircle,
   MoreVertical,
   Download,
   RefreshCw
@@ -68,7 +62,7 @@ type SortField = 'createdAt' | 'leadScore' | 'name' | 'status';
 type SortOrder = 'asc' | 'desc';
 
 export default function AdminLeadsPage() {
-  const { data: session } = useSession();
+  useSession();
   const [leads, setLeads] = useState<ContactSubmission[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -89,6 +83,7 @@ export default function AdminLeadsPage() {
   useEffect(() => {
     fetchLeads();
     fetchStats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterStatus, sortField, sortOrder, searchQuery]);
 
   const fetchLeads = async () => {
@@ -180,7 +175,7 @@ export default function AdminLeadsPage() {
 
       // Apply sorting
       filteredLeads.sort((a, b) => {
-        let aValue: any, bValue: any;
+        let aValue: string | number | Date, bValue: string | number | Date;
 
         switch (sortField) {
           case 'leadScore':

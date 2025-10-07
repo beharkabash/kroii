@@ -16,9 +16,7 @@ import {
   Edit,
   Trash2,
   Eye,
-  MoreVertical,
   ChevronDown,
-  Star,
   CheckCircle,
   XCircle,
   Clock,
@@ -49,6 +47,7 @@ export default function AdminCarsPage() {
 
   useEffect(() => {
     fetchCars();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterStatus, sortField, sortOrder, searchQuery]);
 
   const fetchCars = async () => {

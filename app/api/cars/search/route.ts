@@ -23,11 +23,11 @@ export async function GET(request: NextRequest) {
     // Parse pagination
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
-    const sortBy = (searchParams.get('sortBy') || 'createdAt') as any;
-    const sortOrder = (searchParams.get('sortOrder') || 'desc') as any;
+    const sortBy = (searchParams.get('sortBy') || 'createdAt') as 'name' | 'priceEur' | 'year' | 'kmNumber' | 'createdAt';
+    const sortOrder = (searchParams.get('sortOrder') || 'desc') as 'asc' | 'desc';
 
     // Parse filters
-    const filters: any = {};
+    const filters: Record<string, string | number | CarCategory | CarStatus> = {};
 
     if (searchParams.get('brand')) {
       filters.brand = searchParams.get('brand')!;
@@ -97,7 +97,7 @@ export async function GET(request: NextRequest) {
  * Get search metadata (brands, categories, etc.)
  * Used for populating search filters
  */
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     const brands = await getAllBrands();
     const categoryCounts = await getCarCountByCategory();

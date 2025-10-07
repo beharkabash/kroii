@@ -8,7 +8,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Car,
+  Car as CarIcon,
   Grid,
   List,
   Search,
@@ -24,8 +24,37 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getPlaceholder } from '@/app/lib/image-placeholder';
 
+interface Car {
+  // Updated to match LegacyCarFormat
+  id: string;
+  name: string;
+  model: string;
+  description: string;
+  priceEur: number;
+  price: string; // Formatted price
+  kmNumber: number;
+  km: string; // Formatted km
+  slug: string;
+  image?: string; // Primary image URL
+  images: { url: string; altText: string; order?: number; isPrimary?: boolean }[];
+  fuel: string;
+  transmission: string;
+  status?: string;
+  category?: string;
+  condition?: string;
+  featured?: boolean;
+  features?: { feature: string }[];
+  specifications?: { label: string; value: string }[];
+  detailedDescription?: string[];
+  color?: string;
+  driveType?: string;
+  engineSize?: string;
+  power?: number;
+  brand?: string;
+}
+
 interface BrandPageContentProps {
-  cars: any[];
+  cars: Car[];
   brandName: string;
   brandDescription: string;
   brand: string;
@@ -38,9 +67,8 @@ export default function BrandPageContent({
   cars: initialCars,
   brandName,
   brandDescription,
-  brand
 }: BrandPageContentProps) {
-  const [cars, setCars] = useState(initialCars);
+  const [cars] = useState(initialCars);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [sortBy, setSortBy] = useState<SortOption>('price-asc');
   const [searchQuery, setSearchQuery] = useState('');
@@ -57,7 +85,7 @@ export default function BrandPageContent({
     })
     .sort((a, b) => {
       const [field, order] = sortBy.split('-');
-      let aValue: any, bValue: any;
+      let aValue: string | number, bValue: string | number;
 
       switch (field) {
         case 'price':
@@ -65,8 +93,8 @@ export default function BrandPageContent({
           bValue = b.priceEur;
           break;
         case 'year':
-          aValue = parseInt(a.year);
-          bValue = parseInt(b.year);
+          aValue = typeof a.year === 'string' ? parseInt(a.year) : a.year;
+          bValue = typeof b.year === 'string' ? parseInt(b.year) : b.year;
           break;
         case 'km':
           aValue = a.kmNumber;
@@ -103,12 +131,9 @@ export default function BrandPageContent({
     : 0;
 
   const newestYear = cars.length > 0
-    ? Math.max(...cars.map(car => parseInt(car.year)))
+    ? Math.max(...cars.map(car => typeof car.year === 'string' ? parseInt(car.year) : car.year))
     : 0;
 
-  const oldestYear = cars.length > 0
-    ? Math.min(...cars.map(car => parseInt(car.year)))
-    : 0;
 
   const getBrandLogo = (brandName: string) => {
     // In a real implementation, these would be actual brand logos
@@ -182,10 +207,10 @@ export default function BrandPageContent({
                 transition={{ duration: 0.8, delay: 0.2 }}
                 className="relative h-80 w-full"
               >
-                {cars.length > 0 && cars[0].image ? (
+                {cars.length > 0 && (cars[0].image || cars[0].images?.[0]?.url) ? (
                   <div className="relative h-full rounded-2xl overflow-hidden shadow-2xl">
                     <Image
-                      src={cars[0].image}
+                      src={cars[0].image || cars[0].images?.[0]?.url || '/cars/placeholder.jpg'}
                       alt={`${brandName} auto`}
                       fill
                       className="object-cover"
@@ -196,7 +221,7 @@ export default function BrandPageContent({
                   </div>
                 ) : (
                   <div className="h-full bg-gradient-to-br from-purple-600 to-pink-500 rounded-2xl flex items-center justify-center shadow-2xl">
-                    <Car className="h-32 w-32 text-white opacity-50" />
+                    <CarIcon className="h-32 w-32 text-white opacity-50" />
                   </div>
                 )}
               </motion.div>
@@ -320,9 +345,9 @@ export default function BrandPageContent({
                     <div className={`relative bg-gradient-to-br from-purple-100 to-pink-100 overflow-hidden ${
                       viewMode === 'list' ? 'w-64 h-48' : 'h-48'
                     }`}>
-                      {car.image ? (
+                      {(car.image || car.images?.[0]?.url) ? (
                         <Image
-                          src={car.image}
+                          src={car.image || car.images?.[0]?.url || '/cars/placeholder.jpg'}
                           alt={car.name}
                           fill
                           className="object-cover group-hover:scale-110 transition-transform duration-500"
@@ -334,7 +359,7 @@ export default function BrandPageContent({
                         />
                       ) : (
                         <div className="h-full flex items-center justify-center">
-                          <Car className="h-24 w-24 text-purple-400" />
+                          <CarIcon className="h-24 w-24 text-purple-400" />
                         </div>
                       )}
                     </div>
@@ -343,7 +368,7 @@ export default function BrandPageContent({
                         {car.name}
                       </h3>
                       <p className="text-2xl md:text-3xl font-bold text-purple-600 mb-4">
-                        {car.price}
+                        {car.price || `€${car.priceEur.toLocaleString()}`}
                       </p>
                       <div className={`space-y-2 text-sm text-slate-600 ${
                         viewMode === 'list' ? 'grid grid-cols-2 gap-2' : ''
@@ -351,7 +376,7 @@ export default function BrandPageContent({
                         <p>📅 {car.year}</p>
                         <p>⛽ {car.fuel}</p>
                         <p>⚙️ {car.transmission}</p>
-                        <p>🛣️ {car.km}</p>
+                        <p>🛣️ {car.km || `${car.kmNumber.toLocaleString()} km`}</p>
                       </div>
                       {viewMode === 'list' && (
                         <p className="text-slate-600 mt-4 line-clamp-2">

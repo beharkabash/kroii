@@ -9,18 +9,22 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  username      String    @unique
-  passwordHash  String
-  firstName     String?
-  lastName      String?
-  role          String    @default("ADMIN")
-  isActive      Boolean   @default(true)
-  emailVerified DateTime? @db.Timestamp(6)
-  lastLogin     DateTime? @db.Timestamp(6)
-  createdAt     DateTime  @default(now()) @db.Timestamp(6)
-  updatedAt     DateTime  @default(now()) @updatedAt @db.Timestamp(6)
+  id               String              @id @default(cuid())
+  email            String              @unique
+  username         String              @unique
+  password         String              // Changed from passwordHash for compatibility
+  name             String?             // Added for compatibility
+  firstName        String?
+  lastName         String?
+  role             String              @default("ADMIN")
+  isActive         Boolean             @default(true)
+  emailVerified    DateTime?           @db.Timestamp(6)
+  lastLogin        DateTime?           @db.Timestamp(6) // Changed for compatibility
+  createdAt        DateTime            @default(now()) @db.Timestamp(6)
+  updatedAt        DateTime            @default(now()) @updatedAt @db.Timestamp(6)
+  contactNotes     ContactNote[]
+  assignedContacts ContactSubmission[]
+  activityLogs     ActivityLog[]
 
   @@map("users")
 }
@@ -1093,25 +1097,36 @@ model Car {
   priceEur           Int
   year               Int
   kmNumber           Int
-  fuel               String
-  transmission       String
+  fuel               FuelType
+  transmission       TransmissionType
   description        String
   detailedDescription String?
   condition          String?
   category           CarCategory
   status             CarStatus          @default(AVAILABLE)
+  featured           Boolean            @default(false)
+  color              String?
+  driveType          DriveType?
+  engineSize         String?
+  power              Int?
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
   images             CarImage[]
   features           CarFeature[]
   specifications     CarSpecification[]
   views              CarView[]
+  contacts           ContactSubmission[]
+  inquiries          ContactInquiry[]
+  @@index([brand, status])
+  @@index([category, status])
+  @@index([featured, status])
 }
 
 model CarImage {
   id        String  @id @default(cuid())
   carId     String
   url       String
+  altText   String?
   isPrimary Boolean @default(false)
   order     Int     @default(0)
   car       Car     @relation(fields: [carId], references: [id], onDelete: Cascade)
@@ -1147,4 +1162,122 @@ model CarView {
   createdAt DateTime  @default(now())
   car       Car       @relation(fields: [carId], references: [id], onDelete: Cascade)
   @@index([carId, createdAt])
+}
+
+// Contact and Lead Management Models
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  CONVERTED
+  CLOSED
+}
+
+enum LeadPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum ActivityType {
+  EMAIL_SENT
+  PHONE_CALL
+  NOTE_ADDED
+  STATUS_CHANGED
+  MEETING_SCHEDULED
+}
+
+enum FuelType {
+  GASOLINE
+  DIESEL
+  HYBRID
+  ELECTRIC
+  OTHER
+}
+
+enum TransmissionType {
+  MANUAL
+  AUTOMATIC
+  CVT
+}
+
+enum DriveType {
+  FWD
+  RWD
+  AWD
+  FOUR_WD
+}
+
+model ContactSubmission {
+  id          String            @id @default(cuid())
+  name        String
+  email       String
+  phone       String?
+  message     String
+  leadScore   Int               @default(0)
+  source      String            @default("contact_form")
+  carId       String?
+  ip          String?
+  userAgent   String?
+  status      LeadStatus        @default(NEW)
+  priority    LeadPriority      @default(MEDIUM)
+  assignedToId String?
+  respondedAt  DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  car         Car?              @relation(fields: [carId], references: [id])
+  assignedTo  User?             @relation(fields: [assignedToId], references: [id])
+  notes       ContactNote[]
+  activities  ContactActivity[]
+  inquiries   ContactInquiry[]
+  @@index([status, createdAt])
+  @@index([assignedToId])
+}
+
+model ContactNote {
+  id        String            @id @default(cuid())
+  contactId String
+  userId    String
+  note      String
+  createdAt DateTime          @default(now())
+  contact   ContactSubmission @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  user      User              @relation(fields: [userId], references: [id])
+  @@index([contactId, createdAt])
+}
+
+model ContactActivity {
+  id          String            @id @default(cuid())
+  contactId   String
+  type        ActivityType
+  description String
+  metadata    Json?
+  createdAt   DateTime          @default(now())
+  contact     ContactSubmission @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  @@index([contactId, createdAt])
+}
+
+model ContactInquiry {
+  id        String            @id @default(cuid())
+  contactId String
+  carId     String?
+  type      String            @default("general")
+  message   String?
+  createdAt DateTime          @default(now())
+  contact   ContactSubmission @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  car       Car?              @relation(fields: [carId], references: [id])
+  @@index([contactId])
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  entity    String
+  entityId  String
+  metadata  Json?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  @@index([userId, createdAt])
+  @@index([action, createdAt])
 }

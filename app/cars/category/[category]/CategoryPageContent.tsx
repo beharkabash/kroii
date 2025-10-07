@@ -5,7 +5,7 @@
  * Client component for displaying cars in a specific category
  */
 
-import { Car as CarType } from '@/app/data/cars';
+import { LegacyCarFormat as CarType } from '@/app/lib/db/cars';
 import { getPlaceholder } from '@/app/lib/image-placeholder';
 import { motion } from 'framer-motion';
 import {

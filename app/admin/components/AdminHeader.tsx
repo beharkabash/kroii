@@ -17,8 +17,7 @@ import {
   Settings,
   ChevronDown,
   Home,
-  Plus,
-  RefreshCw
+  Plus
 } from 'lucide-react';
 import Link from 'next/link';
 

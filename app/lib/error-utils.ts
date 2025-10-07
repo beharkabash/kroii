@@ -130,7 +130,7 @@ export function handleApiError(error: unknown): AppError {
  * Standardized API error handler for fetch requests
  */
 export async function handleFetchError(response: Response): Promise<never> {
-  let errorData: any;
+  let errorData: { error?: string; message?: string; [key: string]: unknown };
 
   try {
     errorData = await response.json();
@@ -164,7 +164,7 @@ export async function handleFetchError(response: Response): Promise<never> {
 export async function fetchWithErrorHandling(
   url: string,
   options: RequestInit = {}
-): Promise<any> {
+): Promise<unknown> {
   try {
     const response = await fetch(url, {
       headers: {

@@ -7,9 +7,42 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { getPlaceholder } from '@/app/lib/image-placeholder';
 
+interface CarImage {
+  url: string;
+  altText: string;
+  order: number;
+  isPrimary: boolean;
+}
+
+interface CarData {
+  id: string;
+  slug: string;
+  name: string;
+  brand: string;
+  model: string;
+  year: string | number;
+  priceEur: number;
+  fuel: string;
+  transmission: string;
+  kmNumber: number;
+  color?: string;
+  driveType?: string;
+  engineSize?: string;
+  power?: number;
+  status: string;
+  condition: string;
+  category: string;
+  featured: boolean;
+  description: string;
+  detailedDescription?: string[];
+  images: CarImage[];
+  features?: { feature: string }[];
+  specifications?: { label: string; value: string }[];
+}
+
 interface CarDetailContentProps {
-  car: any | null;
-  relatedCars: any[];
+  car: CarData | null;
+  relatedCars: CarData[];
 }
 
 /**
@@ -38,7 +71,7 @@ export function CarDetailContent({ car, relatedCars }: CarDetailContentProps) {
     );
   }
 
-  const whatsappUrl = `https://wa.me/358413188214?text=Hei! Olen kiinnostunut autosta: ${encodeURIComponent(car.name)} (${encodeURIComponent(car.price)})`;
+  const whatsappUrl = `https://wa.me/358413188214?text=Hei! Olen kiinnostunut autosta: ${encodeURIComponent(car.name)} (${encodeURIComponent('€' + car.priceEur.toLocaleString())})`;
   const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
 
   const handleShare = async () => {
@@ -46,7 +79,7 @@ export function CarDetailContent({ car, relatedCars }: CarDetailContentProps) {
       try {
         await navigator.share({
           title: `${car.name} - Kroi Auto Center`,
-          text: `Katso tämä auto: ${car.name} hintaan ${car.price}`,
+          text: `Katso tämä auto: ${car.name} hintaan €${car.priceEur.toLocaleString()}`,
           url: shareUrl,
         });
       } catch {
@@ -65,7 +98,7 @@ export function CarDetailContent({ car, relatedCars }: CarDetailContentProps) {
   };
 
   const handleWhatsAppShare = () => {
-    const text = `Katso tämä auto: ${car.name} hintaan ${car.price} - ${shareUrl}`;
+    const text = `Katso tämä auto: ${car.name} hintaan €${car.priceEur.toLocaleString()} - ${shareUrl}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer');
   };
 
@@ -127,9 +160,9 @@ export function CarDetailContent({ car, relatedCars }: CarDetailContentProps) {
               transition={{ duration: 0.5 }}
               className="relative h-[300px] md:h-[400px] lg:h-[500px] rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-purple-100 to-pink-100"
             >
-              {car.image ? (
+              {car.images?.[0]?.url ? (
                 <Image
-                  src={car.image}
+                  src={car.images[0].url}
                   alt={car.name}
                   fill
                   className="object-cover"
@@ -158,7 +191,7 @@ export function CarDetailContent({ car, relatedCars }: CarDetailContentProps) {
               </div>
 
               <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-200">
-                <div className="text-5xl font-bold text-purple-600 mb-4">{car.price}</div>
+                <div className="text-5xl font-bold text-purple-600 mb-4">€{car.priceEur.toLocaleString()}</div>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="flex items-center space-x-2">
                     <Calendar className="h-5 w-5 text-purple-600" />
@@ -166,7 +199,7 @@ export function CarDetailContent({ car, relatedCars }: CarDetailContentProps) {
                   </div>
                   <div className="flex items-center space-x-2">
                     <Gauge className="h-5 w-5 text-purple-600" />
-                    <span className="text-slate-700">{car.km}</span>
+                    <span className="text-slate-700">{car.kmNumber.toLocaleString()} km</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Fuel className="h-5 w-5 text-purple-600" />
@@ -256,9 +289,13 @@ export function CarDetailContent({ car, relatedCars }: CarDetailContentProps) {
           >
             <h2 className="text-3xl font-bold text-slate-900 mb-6">Kuvaus</h2>
             <div className="space-y-4 text-slate-700 leading-relaxed">
-              {car.detailedDescription.map((paragraph: string, index: number) => (
-                <p key={index}>{paragraph}</p>
-              ))}
+              {Array.isArray(car.detailedDescription) ? (
+                car.detailedDescription.map((paragraph, index) => (
+                  <p key={index}>{paragraph}</p>
+                ))
+              ) : (
+                <p>{car.detailedDescription || car.description}</p>
+              )}
             </div>
           </motion.div>
         </div>
@@ -274,7 +311,7 @@ export function CarDetailContent({ car, relatedCars }: CarDetailContentProps) {
           >
             <h2 className="text-3xl font-bold text-slate-900 mb-8">Tekniset tiedot</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {car.specifications.map((spec: any, index: number) => (
+              {car.specifications?.map((spec, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 20 }}
@@ -302,7 +339,7 @@ export function CarDetailContent({ car, relatedCars }: CarDetailContentProps) {
           >
             <h2 className="text-3xl font-bold text-slate-900 mb-8">Varusteet</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {car.features.map((feature: string, index: number) => (
+              {car.features?.map((feature, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, x: -20 }}
@@ -312,7 +349,7 @@ export function CarDetailContent({ car, relatedCars }: CarDetailContentProps) {
                   className="flex items-center space-x-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-3 border border-purple-100"
                 >
                   <Check className="h-5 w-5 text-purple-600 flex-shrink-0" />
-                  <span className="text-slate-700">{feature}</span>
+                  <span className="text-slate-700">{typeof feature === 'string' ? feature : feature.feature}</span>
                 </motion.div>
               ))}
             </div>
@@ -387,9 +424,9 @@ export function CarDetailContent({ car, relatedCars }: CarDetailContentProps) {
                       className="block bg-white rounded-xl overflow-hidden border border-slate-200 hover:border-purple-300 transition-all duration-300 hover:shadow-xl group"
                     >
                       <div className="relative h-48 bg-gradient-to-br from-purple-100 to-pink-100 overflow-hidden">
-                        {relatedCar.image ? (
+                        {relatedCar.images?.[0]?.url ? (
                           <Image
-                            src={relatedCar.image}
+                            src={relatedCar.images[0].url}
                             alt={relatedCar.name}
                             fill
                             className="object-cover group-hover:scale-110 transition-transform duration-300"
@@ -407,7 +444,7 @@ export function CarDetailContent({ car, relatedCars }: CarDetailContentProps) {
                         <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-purple-600 transition">
                           {relatedCar.name}
                         </h3>
-                        <p className="text-2xl font-bold text-purple-600 mb-3">{relatedCar.price}</p>
+                        <p className="text-2xl font-bold text-purple-600 mb-3">€{relatedCar.priceEur.toLocaleString()}</p>
                         <div className="grid grid-cols-2 gap-2 text-sm text-slate-600">
                           <div className="flex items-center space-x-1">
                             <Calendar className="h-4 w-4" />
@@ -415,7 +452,7 @@ export function CarDetailContent({ car, relatedCars }: CarDetailContentProps) {
                           </div>
                           <div className="flex items-center space-x-1">
                             <Gauge className="h-4 w-4" />
-                            <span>{relatedCar.km}</span>
+                            <span>{relatedCar.kmNumber.toLocaleString()} km</span>
                           </div>
                         </div>
                       </div>

@@ -64,7 +64,7 @@ export default async function BrandPage({ params }: BrandPageProps) {
 
   try {
     // Get cars from this brand with fallback for missing database
-    let cars = [];
+    let cars: ReturnType<typeof convertToLegacyFormat>[] = [];
 
     if (process.env.DATABASE_URL) {
       const dbCars = await getCarsByBrand(decodedBrand, {

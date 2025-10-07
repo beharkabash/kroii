@@ -12,15 +12,20 @@ import { motion } from 'framer-motion';
 import {
   Car,
   Save,
-  X,
   Plus,
   Trash2,
   ArrowLeft,
-  Upload,
   AlertCircle
 } from 'lucide-react';
 import Link from 'next/link';
-import { CarCategory, CarStatus, CarCondition, FuelType, TransmissionType, DriveType } from '@prisma/client';
+import { CarCategory, CarStatus } from '@prisma/client';
+
+interface CarImage {
+  url: string;
+  altText: string;
+  order: number;
+  isPrimary: boolean;
+}
 
 interface CarFormData {
   name: string;
@@ -28,27 +33,22 @@ interface CarFormData {
   model: string;
   year: number;
   priceEur: number;
-  fuel: FuelType;
-  transmission: TransmissionType;
+  fuel: string;
+  transmission: string;
   kmNumber: number;
   color: string;
-  driveType: DriveType | '';
+  driveType: string;
   engineSize: string;
   power: number | '';
   status: CarStatus;
-  condition: CarCondition;
+  condition: string;
   category: CarCategory;
   featured: boolean;
   description: string;
   detailedDescription: string[];
   metaTitle: string;
   metaDescription: string;
-  images: Array<{
-    url: string;
-    altText: string;
-    order: number;
-    isPrimary: boolean;
-  }>;
+  images: CarImage[];
   features: string[];
   specifications: Array<{
     label: string;
@@ -61,12 +61,7 @@ export default function EditCarPage({ params }: { params: Promise<{ id: string }
   const router = useRouter();
   const userRole = session?.user?.role;
 
-  // Check permissions
-  if (userRole !== 'SUPER_ADMIN' && userRole !== 'ADMIN') {
-    router.push('/admin/unauthorized');
-    return null;
-  }
-
+  // Initialize all hooks before any conditional logic
   const [carId, setCarId] = useState<string>('');
   const [formData, setFormData] = useState<CarFormData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -81,15 +76,16 @@ export default function EditCarPage({ params }: { params: Promise<{ id: string }
     getParams();
   }, [params]);
 
+  // Check permissions after hooks are initialized
   useEffect(() => {
-    if (carId) {
-      fetchCar();
+    if (userRole && userRole !== 'SUPER_ADMIN' && userRole !== 'ADMIN') {
+      router.push('/admin/unauthorized');
     }
-  }, [carId]);
+  }, [userRole, router]);
 
-  const fetchCar = async () => {
+  const fetchCar = async (id: string) => {
     try {
-      const response = await fetch(`/api/admin/cars/${carId}`);
+      const response = await fetch(`/api/admin/cars/${id}`);
       const result = await response.json();
 
       if (result.success) {
@@ -115,13 +111,13 @@ export default function EditCarPage({ params }: { params: Promise<{ id: string }
           detailedDescription: car.detailedDescription || [''],
           metaTitle: car.metaTitle || '',
           metaDescription: car.metaDescription || '',
-          images: car.images.length > 0 ? car.images.map((img: any) => ({
+          images: car.images.length > 0 ? car.images.map((img: { url: string; altText: string; order: number; isPrimary: boolean }) => ({
             url: img.url,
             altText: img.altText,
             order: img.order,
             isPrimary: img.isPrimary
           })) : [{ url: '', altText: '', order: 0, isPrimary: true }],
-          features: car.features.length > 0 ? car.features.map((f: any) => f.feature) : [''],
+          features: car.features.length > 0 ? car.features.map((f: { feature: string }) => f.feature) : [''],
           specifications: car.specifications.length > 0 ? car.specifications : [{ label: '', value: '' }]
         });
       } else {
@@ -135,7 +131,13 @@ export default function EditCarPage({ params }: { params: Promise<{ id: string }
     }
   };
 
-  const updateFormData = (field: string, value: any) => {
+  useEffect(() => {
+    if (carId) {
+      fetchCar(carId);
+    }
+  }, [carId]);
+
+  const updateFormData = (field: string, value: string | number | boolean | CarStatus | CarCategory) => {
     if (!formData) return;
     setFormData(prev => prev ? { ...prev, [field]: value } : null);
     // Clear error when field is updated
@@ -168,57 +170,6 @@ export default function EditCarPage({ params }: { params: Promise<{ id: string }
     }) : null);
   };
 
-  const addSpecification = () => {
-    if (!formData) return;
-    setFormData(prev => prev ? ({
-      ...prev,
-      specifications: [...prev.specifications, { label: '', value: '' }]
-    }) : null);
-  };
-
-  const removeSpecification = (index: number) => {
-    if (!formData) return;
-    setFormData(prev => prev ? ({
-      ...prev,
-      specifications: prev.specifications.filter((_, i) => i !== index)
-    }) : null);
-  };
-
-  const updateSpecification = (index: number, field: 'label' | 'value', value: string) => {
-    if (!formData) return;
-    setFormData(prev => prev ? ({
-      ...prev,
-      specifications: prev.specifications.map((spec, i) =>
-        i === index ? { ...spec, [field]: value } : spec
-      )
-    }) : null);
-  };
-
-  const addImage = () => {
-    if (!formData) return;
-    setFormData(prev => prev ? ({
-      ...prev,
-      images: [...prev.images, { url: '', altText: '', order: prev.images.length, isPrimary: false }]
-    }) : null);
-  };
-
-  const removeImage = (index: number) => {
-    if (!formData) return;
-    setFormData(prev => prev ? ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index)
-    }) : null);
-  };
-
-  const updateImage = (index: number, field: string, value: any) => {
-    if (!formData) return;
-    setFormData(prev => prev ? ({
-      ...prev,
-      images: prev.images.map((img, i) =>
-        i === index ? { ...img, [field]: value } : img
-      )
-    }) : null);
-  };
 
   const validateForm = (): boolean => {
     if (!formData) return false;

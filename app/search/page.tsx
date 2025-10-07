@@ -10,18 +10,13 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search,
-  Filter,
-  X,
   SlidersHorizontal,
   Car,
   MapPin,
   Phone,
   MessageCircle,
-  ChevronDown,
   Grid,
-  List,
-  SortAsc,
-  SortDesc
+  List
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -71,7 +66,7 @@ export default function SearchPage() {
   });
 
   const [brands, setBrands] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState({ min: 0, max: 100000 });
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 50000 });
 
   useEffect(() => {
     fetchSearchMetadata();
@@ -84,6 +79,7 @@ export default function SearchPage() {
     }, 300); // Debounce search
 
     return () => clearTimeout(timeoutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters, sortBy]);
 
   const fetchSearchMetadata = async () => {

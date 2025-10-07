@@ -5,22 +5,26 @@
  * Form for creating new cars in the admin panel
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { motion } from 'framer-motion';
 import {
-  Car,
   Save,
-  X,
   Plus,
   Trash2,
   ArrowLeft,
-  Upload,
   AlertCircle
 } from 'lucide-react';
 import Link from 'next/link';
-import { CarCategory, CarStatus, CarCondition, FuelType, TransmissionType, DriveType } from '@prisma/client';
+import { CarCategory, CarStatus } from '@prisma/client';
+
+interface CarImage {
+  url: string;
+  altText: string;
+  order: number;
+  isPrimary: boolean;
+}
 
 interface CarFormData {
   name: string;
@@ -28,27 +32,22 @@ interface CarFormData {
   model: string;
   year: number;
   priceEur: number;
-  fuel: FuelType;
-  transmission: TransmissionType;
+  fuel: string;
+  transmission: string;
   kmNumber: number;
   color: string;
-  driveType: DriveType | '';
+  driveType: string;
   engineSize: string;
   power: number | '';
   status: CarStatus;
-  condition: CarCondition;
+  condition: string;
   category: CarCategory;
   featured: boolean;
   description: string;
   detailedDescription: string[];
   metaTitle: string;
   metaDescription: string;
-  images: Array<{
-    url: string;
-    altText: string;
-    order: number;
-    isPrimary: boolean;
-  }>;
+  images: CarImage[];
   features: string[];
   specifications: Array<{
     label: string;
@@ -61,27 +60,22 @@ export default function NewCarPage() {
   const router = useRouter();
   const userRole = session?.user?.role;
 
-  // Check permissions
-  if (userRole !== 'SUPER_ADMIN' && userRole !== 'ADMIN') {
-    router.push('/admin/unauthorized');
-    return null;
-  }
-
+  // Initialize all hooks before any conditional logic
   const [formData, setFormData] = useState<CarFormData>({
     name: '',
     brand: '',
     model: '',
     year: new Date().getFullYear(),
     priceEur: 0,
-    fuel: 'DIESEL' as FuelType,
-    transmission: 'AUTOMATIC' as TransmissionType,
+    fuel: 'DIESEL',
+    transmission: 'AUTOMATIC',
     kmNumber: 0,
     color: '',
     driveType: '',
     engineSize: '',
     power: '',
     status: 'AVAILABLE' as CarStatus,
-    condition: 'GOOD' as CarCondition,
+    condition: 'GOOD',
     category: 'FAMILY' as CarCategory,
     featured: false,
     description: '',
@@ -96,7 +90,14 @@ export default function NewCarPage() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const updateFormData = (field: string, value: any) => {
+  // Check permissions after hooks are initialized
+  useEffect(() => {
+    if (userRole && userRole !== 'SUPER_ADMIN' && userRole !== 'ADMIN') {
+      router.push('/admin/unauthorized');
+    }
+  }, [userRole, router]);
+
+  const updateFormData = (field: string, value: string | number | boolean | CarStatus | CarCategory) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     // Clear error when field is updated
     if (errors[field]) {
@@ -162,7 +163,7 @@ export default function NewCarPage() {
     }));
   };
 
-  const updateImage = (index: number, field: string, value: any) => {
+  const updateImage = (index: number, field: string, value: string | number | boolean) => {
     setFormData(prev => ({
       ...prev,
       images: prev.images.map((img, i) =>

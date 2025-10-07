@@ -6,7 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/lib/auth';
-import { PrismaClient, CarStatus, CarCondition, CarCategory, FuelType, TransmissionType, DriveType } from '@prisma/client';
+import { PrismaClient, CarStatus, CarCategory } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -81,15 +81,15 @@ export async function POST(request: NextRequest) {
       model: data.model,
       year: parseInt(data.year),
       priceEur: parseInt(data.priceEur),
-      fuel: data.fuel as FuelType,
-      transmission: data.transmission as TransmissionType,
+      fuel: data.fuel,
+      transmission: data.transmission,
       kmNumber: parseInt(data.kmNumber) || 0,
       color: data.color || null,
-      driveType: data.driveType ? (data.driveType as DriveType) : null,
+      driveType: data.driveType || null,
       engineSize: data.engineSize || null,
       power: data.power ? parseInt(data.power) : null,
       status: (data.status as CarStatus) || CarStatus.AVAILABLE,
-      condition: (data.condition as CarCondition) || CarCondition.GOOD,
+      condition: data.condition || 'GOOD',
       category: data.category as CarCategory,
       featured: Boolean(data.featured),
       description: data.description,
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
 
         // Create images
         images: {
-          create: (data.images || []).map((img: any, index: number) => ({
+          create: (data.images || []).map((img: { url: string; altText?: string; isPrimary?: boolean }, index: number) => ({
             url: img.url,
             altText: img.altText || carData.name,
             order: index,
@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
 
         // Create specifications
         specifications: {
-          create: (data.specifications || []).map((spec: any, index: number) => ({
+          create: (data.specifications || []).map((spec: { label: string; value: string }, index: number) => ({
             label: spec.label,
             value: spec.value,
             order: index,
@@ -138,21 +138,22 @@ export async function POST(request: NextRequest) {
     });
 
     // Log the activity
-    await prisma.activityLog.create({
-      data: {
-        userId: session.user.id,
-        action: 'CAR_CREATED',
-        entity: 'car',
-        entityId: car.id,
-        metadata: {
-          carName: car.name,
-          brand: car.brand,
-          model: car.model,
-          year: car.year,
-          price: car.priceEur,
-        }
-      }
-    });
+    // Note: activityLog table not available yet
+    // await prisma.activityLog.create({
+    //   data: {
+    //     userId: session.user.id,
+    //     action: 'CAR_CREATED',
+    //     entity: 'car',
+    //     entityId: car.id,
+    //     metadata: {
+    //       carName: car.name,
+    //       brand: car.brand,
+    //       model: car.model,
+    //       year: car.year,
+    //       price: car.priceEur,
+    //     }
+    //   }
+    // });
 
     return NextResponse.json({
       success: true,

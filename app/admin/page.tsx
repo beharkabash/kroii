@@ -13,14 +13,10 @@ import {
   MessageSquare,
   Users,
   TrendingUp,
-  Calendar,
   Eye,
-  DollarSign,
-  Activity,
   BarChart3,
   Clock,
-  CheckCircle,
-  AlertCircle
+  CheckCircle
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -42,7 +38,7 @@ interface RecentActivity {
   type: 'car_view' | 'lead_created' | 'car_sold' | 'user_login';
   message: string;
   timestamp: string;
-  icon: any;
+  icon: React.ElementType;
   color: string;
 }
 

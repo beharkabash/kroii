@@ -31,7 +31,7 @@ import {
 interface NavItem {
   name: string;
   href: string;
-  icon: any;
+  icon: React.ElementType;
   current?: boolean;
   children?: NavItem[];
   badge?: string;

@@ -59,7 +59,7 @@ export async function getAllCars(
   // TODO: Implement server-side only caching
 
   // Build where clause
-  const where: any = {
+  const where: Record<string, unknown> = {
     status: filters.status || CarStatus.AVAILABLE,
   };
 
@@ -76,14 +76,14 @@ export async function getAllCars(
 
   if (filters.minPrice || filters.maxPrice) {
     where.priceEur = {};
-    if (filters.minPrice) where.priceEur.gte = filters.minPrice;
-    if (filters.maxPrice) where.priceEur.lte = filters.maxPrice;
+    if (filters.minPrice) (where.priceEur as { gte?: number; lte?: number }).gte = filters.minPrice;
+    if (filters.maxPrice) (where.priceEur as { gte?: number; lte?: number }).lte = filters.maxPrice;
   }
 
   if (filters.minYear || filters.maxYear) {
     where.year = {};
-    if (filters.minYear) where.year.gte = filters.minYear;
-    if (filters.maxYear) where.year.lte = filters.maxYear;
+    if (filters.minYear) (where.year as { gte?: number; lte?: number }).gte = filters.minYear;
+    if (filters.maxYear) (where.year as { gte?: number; lte?: number }).lte = filters.maxYear;
   }
 
   if (filters.fuel) {
@@ -383,10 +383,39 @@ export async function trackCarView(
   }
 }
 
+export interface LegacyCarFormat {
+  id: string;
+  slug: string;
+  name: string;
+  brand: string;
+  model: string;
+  price: string;
+  priceEur: number;
+  year: string;
+  fuel: string;
+  transmission: string;
+  km: string;
+  kmNumber: number;
+  image: string;
+  description: string;
+  detailedDescription: string[];
+  features: { feature: string }[];
+  specifications: { label: string; value: string }[];
+  condition: string;
+  category: string;
+  status: string;
+  featured: boolean;
+  images: { url: string; altText: string; order: number; isPrimary: boolean }[];
+  color?: string;
+  driveType?: string;
+  engineSize?: string;
+  power?: number;
+}
+
 /**
  * Convert database car to legacy format for backward compatibility
  */
-export function convertToLegacyFormat(car: CarWithDetails): any {
+export function convertToLegacyFormat(car: CarWithDetails): LegacyCarFormat {
   const primaryImage = car.images.find(img => img.isPrimary) || car.images[0];
 
   return {
@@ -404,13 +433,25 @@ export function convertToLegacyFormat(car: CarWithDetails): any {
     kmNumber: car.kmNumber,
     image: primaryImage?.url || '',
     description: car.description,
-    detailedDescription: car.detailedDescription,
-    features: car.features.map(f => f.feature),
+    detailedDescription: car.detailedDescription ? car.detailedDescription.split('\n\n') : [car.description],
+    features: car.features.map(f => ({ feature: f.feature })),
     specifications: car.specifications.map(s => ({
       label: s.label,
       value: s.value
     })),
-    condition: car.condition,
-    category: car.category.toLowerCase()
+    condition: car.condition || 'Good condition',
+    category: car.category.toLowerCase(),
+    status: car.status,
+    featured: car.featured,
+    images: car.images.map(img => ({
+      url: img.url,
+      altText: img.altText || '',
+      order: img.order,
+      isPrimary: img.isPrimary
+    })),
+    color: car.color || undefined,
+    driveType: car.driveType || undefined,
+    engineSize: car.engineSize || undefined,
+    power: car.power || undefined
   };
 }

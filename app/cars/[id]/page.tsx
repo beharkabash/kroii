@@ -67,7 +67,7 @@ export async function generateMetadata({
       'Kroi Auto Center',
     ].join(', '),
     openGraph: {
-      title: `${car.name} - ${car.price}`,
+      title: `${car.name} - €${(car as { priceEur: number }).priceEur.toLocaleString()}`,
       description: car.description,
       url: `${baseUrl}/cars/${car.slug}`,
       siteName: 'Kroi Auto Center',
@@ -153,7 +153,7 @@ export default async function CarDetailPage({ params }: { params: Promise<{ id: 
     },
     'itemCondition': 'https://schema.org/UsedCondition',
     'url': `https://kroiautocenter.fi/cars/${dbCar.slug}`,
-    ...(dbCar.images.length > 0 && {
+    ...(dbCar.images && dbCar.images.length > 0 && {
       'image': `https://kroiautocenter.fi${dbCar.images[0].url}`,
     }),
   };

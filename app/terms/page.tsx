@@ -43,7 +43,7 @@ export default function TermsPage() {
             <section className="mb-8">
               <h2 className="text-2xl font-bold text-slate-900 mb-4">1. Yleistä</h2>
               <p className="text-slate-700">
-                Nämä käyttöehdot koskevat Kroi Auto Center Oy:n (jäljempänä "yritys")
+                Nämä käyttöehdot koskevat Kroi Auto Center Oy:n (jäljempänä &quot;yritys&quot;)
                 verkkosivuston käyttöä sekä yritykseltä tehtäviä ajoneuvon ostoja ja muita palveluita.
                 Käyttämällä sivustoa tai asioimalla kanssamme hyväksyt nämä ehdot.
               </p>
@@ -77,7 +77,7 @@ export default function TermsPage() {
               <ul className="list-disc pl-6 text-slate-700 space-y-2">
                 <li>Kaikki hinnat ovat voimassa ilmoitushetkellä ja sisältävät arvonlisäveron (ALV 25,5%)</li>
                 <li>Pidätämme oikeuden hinnanmuutoksiin ilman ennakkoilmoitusta</li>
-                <li>Ajoneuvot myydään "ensimmäinen maksaa, ensimmäinen omistaa" -periaatteella</li>
+                <li>Ajoneuvot myydään &quot;ensimmäinen maksaa, ensimmäinen omistaa&quot; -periaatteella</li>
                 <li>Emme takaa ajoneuvon saatavuutta ennen kaupan vahvistamista</li>
               </ul>
 

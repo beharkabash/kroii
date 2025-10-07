@@ -211,7 +211,7 @@ export default function CookiePolicyPage() {
 
               <h3 className="text-xl font-semibold text-slate-900 mb-3 mt-6">Evästeasetukset sivustolla</h3>
               <p className="text-slate-700">
-                Voit muuttaa evästeasetuksiasi milloin tahansa klikkaamalla "Evästeasetukset" -painiketta
+                Voit muuttaa evästeasetuksiasi milloin tahansa klikkaamalla &quot;Evästeasetukset&quot; -painiketta
                 sivuston alareunassa.
               </p>
 

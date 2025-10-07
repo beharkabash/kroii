@@ -155,7 +155,7 @@ export default function PrivacyPolicyPage() {
               <ul className="list-disc pl-6 text-slate-700 space-y-2">
                 <li><strong>Oikeus tarkastaa tietosi:</strong> Voit pyytää tietoa siitä, mitä henkilötietoja sinusta on tallennettu</li>
                 <li><strong>Oikeus oikaista tietoja:</strong> Voit pyytää virheellisten tietojen korjaamista</li>
-                <li><strong>Oikeus poistaa tiedot:</strong> Voit pyytää tietojesi poistamista ("oikeus tulla unohdetuksi")</li>
+                <li><strong>Oikeus poistaa tiedot:</strong> Voit pyytää tietojesi poistamista (&quot;oikeus tulla unohdetuksi&quot;)</li>
                 <li><strong>Oikeus rajoittaa käsittelyä:</strong> Voit pyytää tietojesi käsittelyn rajoittamista</li>
                 <li><strong>Vastustamisoikeus:</strong> Voit vastustaa tietojesi käsittelyä markkinointitarkoituksiin</li>
                 <li><strong>Oikeus siirtää tiedot:</strong> Voit pyytää tietojesi siirtämistä toiselle palveluntarjoajalle</li>

@@ -4,7 +4,7 @@
  * Run with: npm run db:seed
  */
 
-import { PrismaClient, CarStatus, CarCategory } from '@prisma/client';
+import { PrismaClient, CarStatus, CarCategory, FuelType, TransmissionType } from '@prisma/client';
 import { cars } from '../app/data/cars';
 
 const prisma = new PrismaClient();
@@ -21,6 +21,28 @@ function mapCategory(category: string): CarCategory {
     'electric': CarCategory.OTHER,
   };
   return catMap[category.toLowerCase()] || CarCategory.SEDAN;
+}
+
+function mapFuelType(fuel: string): FuelType {
+  const fuelMap: Record<string, FuelType> = {
+    'diesel': FuelType.DIESEL,
+    'gasoline': FuelType.GASOLINE,
+    'petrol': FuelType.GASOLINE,
+    'hybrid': FuelType.HYBRID,
+    'electric': FuelType.ELECTRIC,
+  };
+  return fuelMap[fuel.toLowerCase()] || FuelType.OTHER;
+}
+
+function mapTransmission(transmission: string): TransmissionType {
+  const transMap: Record<string, TransmissionType> = {
+    'automatic': TransmissionType.AUTOMATIC,
+    'automaatti': TransmissionType.AUTOMATIC,
+    'manual': TransmissionType.MANUAL,
+    'manuaali': TransmissionType.MANUAL,
+    'cvt': TransmissionType.CVT,
+  };
+  return transMap[transmission.toLowerCase()] || TransmissionType.AUTOMATIC;
 }
 
 async function main() {
@@ -58,8 +80,8 @@ async function main() {
           model: car.model,
           year: parseInt(car.year),
           priceEur: car.priceEur,
-          fuel: car.fuel as any,
-          transmission: car.transmission as any,
+          fuel: mapFuelType(car.fuel),
+          transmission: mapTransmission(car.transmission),
           kmNumber: car.kmNumber,
           status: CarStatus.AVAILABLE,
           condition: 'Good condition',

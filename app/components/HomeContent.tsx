@@ -12,7 +12,7 @@ interface Car {
   name: string;
   brand: string;
   model: string;
-  year: number;
+  year: string | number;
   price: string;
   km: string;
   fuel: string;

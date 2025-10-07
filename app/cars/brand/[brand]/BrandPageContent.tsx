@@ -32,6 +32,7 @@ interface Car {
   description: string;
   priceEur: number;
   price: string; // Formatted price
+  year: string | number;
   kmNumber: number;
   km: string; // Formatted km
   slug: string;

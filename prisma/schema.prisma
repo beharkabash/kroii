@@ -1,0 +1,480 @@
+// Prisma Schema for Kroi Auto Center
+// Database: PostgreSQL
+// ORM: Prisma
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["fullTextSearchPostgres"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ================================
+// AUTHENTICATION & AUTHORIZATION
+// ================================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  password      String    // Hashed with bcrypt
+  image         String?
+  role          UserRole  @default(ADMIN)
+
+  // Timestamps
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastLoginAt   DateTime?
+
+  // Relations
+  accounts      Account[]
+  sessions      Session[]
+  activityLogs  ActivityLog[]
+  assignedLeads ContactSubmission[] @relation("AssignedLeads")
+  contactNotes  ContactNote[] @relation("ContactNotes")
+
+  @@index([email])
+  @@map("users")
+}
+
+enum UserRole {
+  SUPER_ADMIN // Full system access
+  ADMIN       // Car & lead management
+  VIEWER      // Read-only access
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ================================
+// CAR INVENTORY MANAGEMENT
+// ================================
+
+model Car {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+
+  // Basic Information
+  name        String
+  brand       String
+  model       String
+  year        Int
+
+  // Pricing
+  priceEur    Int      // Price in EUR cents to avoid float issues
+
+  // Technical Details
+  fuel        FuelType
+  transmission TransmissionType
+  kmNumber    Int      // Kilometers driven
+  color       String?
+  driveType   DriveType?
+  engineSize  String?
+  power       Int?     // HP
+
+  // Status & Inventory
+  status      CarStatus @default(AVAILABLE)
+  condition   CarCondition @default(GOOD)
+  category    CarCategory
+  featured    Boolean  @default(false)
+  soldAt      DateTime?
+
+  // Content
+  description String   @db.Text
+  detailedDescription String[] // Array of paragraphs
+
+  // SEO & Meta
+  metaTitle       String?
+  metaDescription String?
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  publishedAt DateTime @default(now())
+
+  // Relations
+  images      CarImage[]
+  features    CarFeature[]
+  specifications CarSpecification[]
+  inquiries   ContactSubmission[]
+  views       CarView[]
+
+  @@index([slug])
+  @@index([brand])
+  @@index([status])
+  @@index([category])
+  @@index([featured])
+  @@index([priceEur])
+  @@index([year])
+  @@index([createdAt])
+  @@map("cars")
+}
+
+model CarImage {
+  id        String   @id @default(cuid())
+  carId     String
+  url       String
+  altText   String?
+  order     Int      @default(0)
+  isPrimary Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+
+  car       Car      @relation(fields: [carId], references: [id], onDelete: Cascade)
+
+  @@index([carId])
+  @@index([isPrimary])
+  @@map("car_images")
+}
+
+model CarFeature {
+  id        String   @id @default(cuid())
+  carId     String
+  feature   String
+  order     Int      @default(0)
+
+  car       Car      @relation(fields: [carId], references: [id], onDelete: Cascade)
+
+  @@index([carId])
+  @@map("car_features")
+}
+
+model CarSpecification {
+  id        String   @id @default(cuid())
+  carId     String
+  label     String
+  value     String
+  order     Int      @default(0)
+
+  car       Car      @relation(fields: [carId], references: [id], onDelete: Cascade)
+
+  @@index([carId])
+  @@map("car_specifications")
+}
+
+enum FuelType {
+  DIESEL
+  PETROL
+  ELECTRIC
+  HYBRID
+  PLUGIN_HYBRID
+}
+
+enum TransmissionType {
+  AUTOMATIC
+  MANUAL
+  SEMI_AUTOMATIC
+}
+
+enum DriveType {
+  FWD  // Front-wheel drive
+  RWD  // Rear-wheel drive
+  AWD  // All-wheel drive
+  FOUR_WD // 4x4
+}
+
+enum CarStatus {
+  AVAILABLE
+  RESERVED
+  SOLD
+  COMING_SOON
+  UNDER_MAINTENANCE
+}
+
+enum CarCondition {
+  EXCELLENT
+  GOOD
+  FAIR
+  NEEDS_WORK
+}
+
+enum CarCategory {
+  PREMIUM
+  FAMILY
+  SUV
+  COMPACT
+  SPORTS
+  LUXURY
+  ELECTRIC
+}
+
+// ================================
+// LEAD & CONTACT MANAGEMENT
+// ================================
+
+model ContactSubmission {
+  id        String   @id @default(cuid())
+
+  // Contact Information
+  name      String
+  email     String
+  phone     String?
+  message   String   @db.Text
+
+  // Lead Information
+  leadScore Int      @default(0)
+  source    String   @default("contact_form")
+  status    LeadStatus @default(NEW)
+  priority  LeadPriority @default(MEDIUM)
+
+  // Related Car (if inquiry about specific car)
+  carId     String?
+  car       Car?     @relation(fields: [carId], references: [id], onDelete: SetNull)
+
+  // Assignment
+  assignedToId String?
+  assignedTo   User?   @relation(fields: [assignedToId], references: [id], onDelete: SetNull, name: "AssignedLeads")
+
+  // Metadata
+  ip        String?
+  userAgent String?  @db.Text
+
+  // Timestamps
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  respondedAt  DateTime?
+  closedAt     DateTime?
+
+  // Relations
+  notes        ContactNote[]
+  activities   ContactActivity[]
+
+  @@index([email])
+  @@index([status])
+  @@index([leadScore])
+  @@index([createdAt])
+  @@index([carId])
+  @@map("contact_submissions")
+}
+
+model ContactNote {
+  id        String   @id @default(cuid())
+  contactId String
+  userId    String
+  note      String   @db.Text
+
+  createdAt DateTime @default(now())
+
+  contact   ContactSubmission @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  user      User              @relation(fields: [userId], references: [id], name: "ContactNotes")
+
+  @@index([contactId])
+  @@map("contact_notes")
+}
+
+model ContactActivity {
+  id        String   @id @default(cuid())
+  contactId String
+  type      ActivityType
+  description String @db.Text
+  metadata  Json?
+
+  createdAt DateTime @default(now())
+
+  contact   ContactSubmission @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@index([contactId])
+  @@index([type])
+  @@index([createdAt])
+  @@map("contact_activities")
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  NEGOTIATING
+  CONVERTED
+  LOST
+  SPAM
+}
+
+enum LeadPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum ActivityType {
+  EMAIL_SENT
+  PHONE_CALL
+  MEETING
+  NOTE_ADDED
+  STATUS_CHANGED
+  CAR_SHOWN
+  TEST_DRIVE
+}
+
+// ================================
+// NEWSLETTER & MARKETING
+// ================================
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  status    SubscriptionStatus @default(ACTIVE)
+  source    String?
+
+  // Preferences
+  preferences Json?
+
+  // Timestamps
+  subscribedAt   DateTime @default(now())
+  unsubscribedAt DateTime?
+  lastEmailSent  DateTime?
+
+  @@index([email])
+  @@index([status])
+  @@map("newsletter_subscribers")
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  UNSUBSCRIBED
+  BOUNCED
+}
+
+// ================================
+// ANALYTICS & TRACKING
+// ================================
+
+model CarView {
+  id        String   @id @default(cuid())
+  carId     String
+
+  // User Information
+  ip        String?
+  userAgent String?  @db.Text
+  referrer  String?  @db.Text
+
+  // Session
+  sessionId String?
+
+  createdAt DateTime @default(now())
+
+  car       Car      @relation(fields: [carId], references: [id], onDelete: Cascade)
+
+  @@index([carId])
+  @@index([createdAt])
+  @@map("car_views")
+}
+
+model PageView {
+  id        String   @id @default(cuid())
+  path      String
+
+  // User Information
+  ip        String?
+  userAgent String?  @db.Text
+  referrer  String?  @db.Text
+
+  // Performance
+  loadTime  Int?     // in milliseconds
+
+  createdAt DateTime @default(now())
+
+  @@index([path])
+  @@index([createdAt])
+  @@map("page_views")
+}
+
+model WebVital {
+  id        String   @id @default(cuid())
+  name      String   // CLS, FID, FCP, LCP, TTFB
+  value     Float
+  rating    String   // good, needs-improvement, poor
+
+  // Page Information
+  path      String
+
+  // User Information
+  userAgent String?  @db.Text
+
+  createdAt DateTime @default(now())
+
+  @@index([name])
+  @@index([path])
+  @@index([createdAt])
+  @@map("web_vitals")
+}
+
+// ================================
+// ACTIVITY LOGGING
+// ================================
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  entity    String   // e.g., "car", "contact", "user"
+  entityId  String?
+  metadata  Json?
+
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([entity])
+  @@index([createdAt])
+  @@map("activity_logs")
+}
+
+// ================================
+// SYSTEM CONFIGURATION
+// ================================
+
+model SystemConfig {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("system_config")
+}

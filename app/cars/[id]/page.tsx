@@ -3,6 +3,9 @@ import { getCarById, getRelatedCars, convertToLegacyFormat } from '@/app/lib/db/
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
+// Force dynamic rendering to avoid database issues during build
+export const dynamic = 'force-dynamic';
+
 /**
  * Generate static params for all car pages
  * This enables static site generation at build time

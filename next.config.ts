@@ -39,6 +39,11 @@ const nextConfig: NextConfig = {
   // Modern JavaScript output
   output: 'standalone',
 
+  // Disable static generation for pages that need database during build
+  experimental: {
+    missingSuspenseWithCSRBailout: false,
+  },
+
   // Headers for caching and security
   async headers() {
     return [

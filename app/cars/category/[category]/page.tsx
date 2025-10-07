@@ -9,6 +9,9 @@ import { getCarsByCategory, convertToLegacyFormat, getAllCars } from '@/app/lib/
 import { CarCategory } from '@prisma/client';
 import CategoryPageContent from './CategoryPageContent';
 
+// Force dynamic rendering to avoid database issues during build
+export const dynamic = 'force-dynamic';
+
 interface CategoryPageProps {
   params: Promise<{ category: string }>;
 }
@@ -69,15 +72,17 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const categoryEnum = category.toUpperCase() as CarCategory;
 
   try {
-    // Get cars in this category
-    const dbCars = await getCarsByCategory(categoryEnum, {
-      limit: 50,
-      sortBy: 'createdAt',
-      sortOrder: 'desc'
-    });
+    // Get cars in this category with fallback for missing database
+    let cars = [];
 
-    // Convert to legacy format for compatibility
-    const cars = dbCars.map(convertToLegacyFormat);
+    if (process.env.DATABASE_URL) {
+      const dbCars = await getCarsByCategory(categoryEnum, {
+        limit: 50,
+        sortBy: 'createdAt',
+        sortOrder: 'desc'
+      });
+      cars = dbCars.map(convertToLegacyFormat);
+    }
 
     const categoryNames: Record<string, string> = {
       'premium': 'Premium-autot',

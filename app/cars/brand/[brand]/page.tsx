@@ -8,6 +8,9 @@ import type { Metadata } from 'next';
 import { getCarsByBrand, convertToLegacyFormat, getAllBrands } from '@/app/lib/db/cars';
 import BrandPageContent from './BrandPageContent';
 
+// Force dynamic rendering to avoid database issues during build
+export const dynamic = 'force-dynamic';
+
 interface BrandPageProps {
   params: Promise<{ brand: string }>;
 }
@@ -60,27 +63,30 @@ export default async function BrandPage({ params }: BrandPageProps) {
   const decodedBrand = decodeURIComponent(brand).replace(/-/g, ' ');
 
   try {
-    // Get cars from this brand
-    const dbCars = await getCarsByBrand(decodedBrand, {
-      limit: 50,
-      sortBy: 'createdAt',
-      sortOrder: 'desc'
-    });
+    // Get cars from this brand with fallback for missing database
+    let cars = [];
 
-    // If no cars found, check if brand exists at all
-    if (dbCars.length === 0) {
-      const allBrands = await getAllBrands();
-      const brandExists = allBrands.some(b =>
-        b.toLowerCase().replace(/\s+/g, '-') === brand.toLowerCase()
-      );
+    if (process.env.DATABASE_URL) {
+      const dbCars = await getCarsByBrand(decodedBrand, {
+        limit: 50,
+        sortBy: 'createdAt',
+        sortOrder: 'desc'
+      });
 
-      if (!brandExists) {
-        notFound();
+      // If no cars found, check if brand exists at all
+      if (dbCars.length === 0) {
+        const allBrands = await getAllBrands();
+        const brandExists = allBrands.some(b =>
+          b.toLowerCase().replace(/\s+/g, '-') === brand.toLowerCase()
+        );
+
+        if (!brandExists) {
+          notFound();
+        }
       }
-    }
 
-    // Convert to legacy format for compatibility
-    const cars = dbCars.map(convertToLegacyFormat);
+      cars = dbCars.map(convertToLegacyFormat);
+    }
 
     const brandName = decodedBrand
       .split(' ')

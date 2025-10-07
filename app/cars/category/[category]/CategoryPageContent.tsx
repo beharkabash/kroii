@@ -5,26 +5,25 @@
  * Client component for displaying cars in a specific category
  */
 
-import { useState } from 'react';
+import { Car as CarType } from '@/app/data/cars';
+import { getPlaceholder } from '@/app/lib/image-placeholder';
 import { motion } from 'framer-motion';
 import {
+  ArrowLeft,
   Car,
   Grid,
   List,
-  SortAsc,
-  SortDesc,
-  Search,
-  ArrowLeft,
+  MapPin,
   MessageCircle,
   Phone,
-  MapPin
+  Search
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getPlaceholder } from '@/app/lib/image-placeholder';
+import { useState } from 'react';
 
 interface CategoryPageContentProps {
-  cars: any[];
+  cars: CarType[];
   categoryName: string;
   categoryDescription: string;
   category: string;
@@ -39,7 +38,7 @@ export default function CategoryPageContent({
   categoryDescription,
   category
 }: CategoryPageContentProps) {
-  const [cars, setCars] = useState(initialCars);
+  const cars = initialCars;
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [sortBy, setSortBy] = useState<SortOption>('price-asc');
   const [searchQuery, setSearchQuery] = useState('');
@@ -56,7 +55,7 @@ export default function CategoryPageContent({
     })
     .sort((a, b) => {
       const [field, order] = sortBy.split('-');
-      let aValue: any, bValue: any;
+      let aValue: string | number, bValue: string | number;
 
       switch (field) {
         case 'price':

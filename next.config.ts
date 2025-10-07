@@ -1,14 +1,14 @@
 import type { NextConfig } from "next";
-import withBundleAnalyzer from '@next/bundle-analyzer';
+import withBundleAnalyzer from "@next/bundle-analyzer";
 
 const bundleAnalyzer = withBundleAnalyzer({
-  enabled: process.env.ANALYZE === 'true',
+  enabled: process.env.ANALYZE === "true",
 });
 
 const nextConfig: NextConfig = {
   // Allow deployment with ESLint warnings
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
   typescript: {
     ignoreBuildErrors: false,
@@ -16,20 +16,23 @@ const nextConfig: NextConfig = {
 
   // Optimize images
   images: {
-    formats: ['image/avif', 'image/webp'],
+    formats: ["image/avif", "image/webp"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 60 * 60 * 24 * 365, // 1 year
-    dangerouslyAllowSVG: true,
-    contentDispositionType: 'attachment',
+    dangerouslyAllowSVG: false,
+    contentDispositionType: "attachment",
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 
   // Compiler optimizations
   compiler: {
-    removeConsole: process.env.NODE_ENV === 'production' ? {
-      exclude: ['error', 'warn'],
-    } : false,
+    removeConsole:
+      process.env.NODE_ENV === "production"
+        ? {
+            exclude: ["error", "warn"],
+          }
+        : false,
   },
 
   // Performance optimizations
@@ -37,54 +40,65 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
 
   // Modern JavaScript output
-  output: 'standalone',
+  output: "standalone",
 
-  // Disable static generation for pages that need database during build
-  experimental: {
-    missingSuspenseWithCSRBailout: false,
+  // Increase timeout for static generation
+  staticPageGenerationTimeout: 120,
+
+  // Skip static generation for problematic pages during deployment
+  generateBuildId: async () => {
+    return "kroi-auto-build-" + Date.now();
   },
+
+  // Experimental features - none enabled for stability
+  experimental: {},
+
+  // Disable problematic features during build
+  trailingSlash: false,
+  generateEtags: false,
 
   // Headers for caching and security
   async headers() {
     return [
       // Security headers for all routes
       {
-        source: '/:path*',
+        source: "/:path*",
         headers: [
           {
-            key: 'X-DNS-Prefetch-Control',
-            value: 'on',
+            key: "X-DNS-Prefetch-Control",
+            value: "on",
           },
           {
-            key: 'Strict-Transport-Security',
-            value: 'max-age=63072000; includeSubDomains; preload',
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains; preload",
           },
           {
-            key: 'X-Frame-Options',
-            value: 'SAMEORIGIN',
+            key: "X-Frame-Options",
+            value: "SAMEORIGIN",
           },
           {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
+            key: "X-Content-Type-Options",
+            value: "nosniff",
           },
           {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block',
+            key: "X-XSS-Protection",
+            value: "1; mode=block",
           },
           {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin',
+            key: "Referrer-Policy",
+            value: "strict-origin-when-cross-origin",
           },
           {
-            key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
+            key: "Permissions-Policy",
+            value:
+              "camera=(), microphone=(), geolocation=(), interest-cohort=()",
           },
           {
-            key: 'Content-Security-Policy',
+            key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com",
-              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "script-src 'self' https://www.googletagmanager.com https://www.google-analytics.com",
+              "style-src 'self' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: https: blob:",
               "connect-src 'self' https://www.google-analytics.com https://vitals.vercel-insights.com https://*.sentry.io",
@@ -94,35 +108,35 @@ const nextConfig: NextConfig = {
               "form-action 'self'",
               "frame-ancestors 'self'",
               "upgrade-insecure-requests",
-            ].join('; '),
+            ].join("; "),
           },
         ],
       },
       // Cache headers for static assets
       {
-        source: '/:all*(svg|jpg|jpeg|png|webp|avif|gif|ico)',
+        source: "/:all*(svg|jpg|jpeg|png|webp|avif|gif|ico)",
         headers: [
           {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
           },
         ],
       },
       {
-        source: '/_next/static/:path*',
+        source: "/_next/static/:path*",
         headers: [
           {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
           },
         ],
       },
       {
-        source: '/fonts/:path*',
+        source: "/fonts/:path*",
         headers: [
           {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
           },
         ],
       },

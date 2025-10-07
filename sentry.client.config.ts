@@ -7,7 +7,7 @@ Sentry.init({
   environment: process.env.SENTRY_ENVIRONMENT || process.env.NODE_ENV,
 
   // Adjust this value in production, or use tracesSampler for greater control
-  tracesSampleRate: parseFloat(process.env.SENTRY_TRACES_SAMPLE_RATE || '0.1'),
+  tracesSampleRate: parseFloat(process.env.SENTRY_TRACES_SAMPLE_RATE || "0.1"),
 
   // Session Replay
   replaysSessionSampleRate: 0.1, // 10% of sessions
@@ -25,27 +25,30 @@ Sentry.init({
   // Filter out noise
   ignoreErrors: [
     // Browser extensions
-    'top.GLOBALS',
-    'canvas.contentDocument',
-    'MyApp_RemoveAllHighlights',
-    'atomicFindClose',
+    "top.GLOBALS",
+    "canvas.contentDocument",
+    "MyApp_RemoveAllHighlights",
+    "atomicFindClose",
     // Network errors
-    'NetworkError',
-    'Network request failed',
-    'Failed to fetch',
+    "NetworkError",
+    "Network request failed",
+    "Failed to fetch",
     // Browser-specific errors
-    'ResizeObserver loop limit exceeded',
-    'ResizeObserver loop completed with undelivered notifications',
+    "ResizeObserver loop limit exceeded",
+    "ResizeObserver loop completed with undelivered notifications",
   ],
 
   beforeSend(event, hint) {
     // Filter out localhost errors in development
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       return null;
     }
 
     // Don't send errors from bots
-    if (navigator.userAgent && /bot|crawler|spider/i.test(navigator.userAgent)) {
+    if (
+      navigator.userAgent &&
+      /bot|crawler|spider/i.test(navigator.userAgent)
+    ) {
       return null;
     }
 
@@ -56,7 +59,10 @@ Sentry.init({
   beforeSendTransaction(event) {
     // Remove sensitive data from URLs
     if (event.request?.url) {
-      event.request.url = event.request.url.replace(/([?&])(email|token|password)=[^&]*/gi, '$1$2=REDACTED');
+      event.request.url = event.request.url.replace(
+        /([?&])(email|token|password)=[^&]*/gi,
+        "$1$2=REDACTED"
+      );
     }
     return event;
   },

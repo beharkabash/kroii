@@ -1,9 +1,5 @@
-// Prisma Schema for Kroi Auto Center
-// Database: PostgreSQL
-// ORM: Prisma
-
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearchPostgres"]
 }
 
@@ -12,469 +8,1143 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ================================
-// AUTHENTICATION & AUTHORIZATION
-// ================================
-
 model User {
   id            String    @id @default(cuid())
-  name          String?
   email         String    @unique
-  emailVerified DateTime?
-  password      String    // Hashed with bcrypt
-  image         String?
-  role          UserRole  @default(ADMIN)
+  username      String    @unique
+  passwordHash  String
+  firstName     String?
+  lastName      String?
+  role          String    @default("ADMIN")
+  isActive      Boolean   @default(true)
+  emailVerified DateTime? @db.Timestamp(6)
+  lastLogin     DateTime? @db.Timestamp(6)
+  createdAt     DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt     DateTime  @default(now()) @updatedAt @db.Timestamp(6)
 
-  // Timestamps
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  lastLoginAt   DateTime?
-
-  // Relations
-  accounts      Account[]
-  sessions      Session[]
-  activityLogs  ActivityLog[]
-  assignedLeads ContactSubmission[] @relation("AssignedLeads")
-  contactNotes  ContactNote[] @relation("ContactNotes")
-
-  @@index([email])
   @@map("users")
 }
 
-enum UserRole {
-  SUPER_ADMIN // Full system access
-  ADMIN       // Car & lead management
-  VIEWER      // Read-only access
-}
+model ab_tests {
+  id               String    @id
+  name             String
+  description      String?
+  hypothesis       String?
+  test_type        String
+  entity_id        String
+  status           String    @default("DRAFT")
+  variants         Json?
+  metrics          Json?
+  traffic_split    Float     @default(0.5)
+  conversion_goal  String?
+  confidence_level Float     @default(0.95)
+  min_sample_size  Int       @default(100)
+  target_metric    String
+  start_date       DateTime? @db.Timestamptz(6)
+  end_date         DateTime? @db.Timestamptz(6)
+  winner_variant   String?
+  is_significant   Boolean   @default(false)
+  p_value          Float?
+  improvement      Float?
+  created_at       DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime  @default(now()) @db.Timestamptz(6)
 
-model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-  @@index([userId])
-  @@map("accounts")
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@map("sessions")
-}
-
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
-  @@map("verification_tokens")
-}
-
-// ================================
-// CAR INVENTORY MANAGEMENT
-// ================================
-
-model Car {
-  id          String   @id @default(cuid())
-  slug        String   @unique
-
-  // Basic Information
-  name        String
-  brand       String
-  model       String
-  year        Int
-
-  // Pricing
-  priceEur    Int      // Price in EUR cents to avoid float issues
-
-  // Technical Details
-  fuel        FuelType
-  transmission TransmissionType
-  kmNumber    Int      // Kilometers driven
-  color       String?
-  driveType   DriveType?
-  engineSize  String?
-  power       Int?     // HP
-
-  // Status & Inventory
-  status      CarStatus @default(AVAILABLE)
-  condition   CarCondition @default(GOOD)
-  category    CarCategory
-  featured    Boolean  @default(false)
-  soldAt      DateTime?
-
-  // Content
-  description String   @db.Text
-  detailedDescription String[] // Array of paragraphs
-
-  // SEO & Meta
-  metaTitle       String?
-  metaDescription String?
-
-  // Timestamps
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  publishedAt DateTime @default(now())
-
-  // Relations
-  images      CarImage[]
-  features    CarFeature[]
-  specifications CarSpecification[]
-  inquiries   ContactSubmission[]
-  views       CarView[]
-
-  @@index([slug])
-  @@index([brand])
+  @@index([start_date, end_date])
   @@index([status])
+  @@index([test_type, status])
+}
+
+model alert_notifications {
+  id               String           @id
+  alertId          String
+  vehicleId        String
+  method           String
+  sentAt           DateTime         @default(now())
+  opened           Boolean          @default(false)
+  clicked          Boolean          @default(false)
+  inventory_alerts inventory_alerts @relation(fields: [alertId], references: [id], onDelete: Cascade)
+  vehicles         vehicles         @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([alertId, sentAt])
+  @@index([vehicleId])
+}
+
+model appointments {
+  id               String    @id @default(dbgenerated("(gen_random_uuid())::text"))
+  vehicleId        String?
+  customerName     String
+  customerEmail    String
+  customerPhone    String
+  type             String
+  scheduledDate    DateTime  @db.Timestamptz(6)
+  scheduledTime    String
+  duration         Int?      @default(60)
+  status           String?   @default("SCHEDULED")
+  notes            String?
+  reminderMethod   String?
+  reminderSent     Boolean?  @default(false)
+  confirmationSent Boolean?  @default(false)
+  location         String?
+  createdAt        DateTime? @default(now()) @db.Timestamptz(6)
+  updatedAt        DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@index([customerEmail])
+  @@index([scheduledDate, scheduledTime])
+  @@index([scheduledDate, status])
+  @@index([vehicleId, status])
+  @@index([vehicleId], map: "idx_appointments_vehicleid")
+}
+
+model blog_posts {
+  id             String    @id
+  title          String
+  slug           String    @unique
+  excerpt        String?
+  content        String
+  featuredImage  String?
+  images         String?
+  author         String
+  category       String
+  tags           String?
+  isPublished    Boolean   @default(false)
+  publishedAt    DateTime?
+  seoTitle       String?
+  seoDescription String?
+  views          Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime
+
+  @@index([category, isPublished])
+  @@index([isPublished, publishedAt])
+  @@index([slug])
+}
+
+model buying_guides {
+  id                String   @id
+  title             String
+  slug              String   @unique
+  description       String
+  content           String
+  featuredImage     String?
+  category          String
+  difficulty        String   @default("beginner")
+  estimatedReadTime Int?
+  isPublished       Boolean  @default(false)
+  views             Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime
+
+  @@index([isPublished, category])
+  @@index([slug])
+}
+
+model contacts {
+  id          String   @id
+  name        String
+  email       String
+  phone       String?
+  message     String
+  subject     String?
+  status      String   @default("NEW")
+  clientIP    String?
+  fingerprint String?
+  userAgent   String?
+  createdAt   DateTime @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime @default(now()) @db.Timestamp(6)
+
+  @@index([status, createdAt])
+}
+
+model customer_analytics {
+  id              String   @id
+  customerId      String?
+  sessionId       String?
+  pageViews       Int      @default(1)
+  timeOnSite      Int?
+  vehiclesViewed  String?
+  searchQueries   String?
+  leadSource      String?
+  conversionEvent String?
+  lastActivity    DateTime @default(now())
+  createdAt       DateTime @default(now())
+
+  @@index([conversionEvent])
+  @@index([customerId, lastActivity])
+  @@index([sessionId])
+}
+
+model customer_stories {
+  id           String    @id
+  vehicleId    String?
+  customerName String
+  title        String
+  story        String
+  images       String?
+  videoUrl     String?
+  isPublished  Boolean   @default(false)
+  tags         String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime
+  vehicles     vehicles? @relation(fields: [vehicleId], references: [id])
+
+  @@index([isPublished, createdAt])
+}
+
+model customers {
+  id                        String    @id
+  email                     String    @unique
+  first_name                String?
+  last_name                 String?
+  phone                     String?
+  status                    String    @default("ACTIVE")
+  customer_type             String    @default("INDIVIDUAL")
+  preferred_language        String?   @default("en")
+  communication_preferences Json?
+  total_purchases           Int       @default(0)
+  total_spent               Int       @default(0)
+  average_order_value       Int       @default(0)
+  lifetime_value            Int       @default(0)
+  last_purchase_at          DateTime? @db.Timestamptz(6)
+  tags                      String?
+  notes                     String?
+  metadata                  Json?
+  created_at                DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at                DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@index([customer_type])
+  @@index([email])
+  @@index([last_purchase_at])
+  @@index([status])
+}
+
+model customization_services {
+  id               String    @id
+  vehicleId        String?
+  customerName     String
+  customerEmail    String
+  modificationType String
+  description      String
+  estimatedCost    Int
+  actualCost       Int?
+  timeline         String?
+  status           String    @default("QUOTED")
+  beforePhotos     String?
+  afterPhotos      String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime
+  vehicles         vehicles? @relation(fields: [vehicleId], references: [id])
+
+  @@index([modificationType])
+  @@index([vehicleId, status])
+}
+
+model detailing_services {
+  id            String    @id
+  vehicleId     String?
+  customerName  String
+  customerEmail String
+  packageType   String
+  services      String
+  price         Int
+  scheduledDate DateTime?
+  completedDate DateTime?
+  beforePhotos  String?
+  afterPhotos   String?
+  status        String    @default("BOOKED")
+  rating        Int?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime
+  vehicles      vehicles? @relation(fields: [vehicleId], references: [id])
+
+  @@index([packageType])
+  @@index([vehicleId, status])
+}
+
+model email_campaigns {
+  id               String    @id
+  name             String
+  subject          String
+  content          String
+  html_content     String?
+  from_email       String
+  from_name        String
+  reply_to         String?
+  recipient_count  Int       @default(0)
+  status           String    @default("DRAFT")
+  scheduled_for    DateTime? @db.Timestamptz(6)
+  sent_at          DateTime? @db.Timestamptz(6)
+  open_rate        Float?
+  click_rate       Float?
+  unsubscribe_rate Float?
+  bounce_rate      Float?
+  segment_criteria Json?
+  ab_test_id       String?
+  tags             String?
+  created_at       DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@index([scheduled_for])
+  @@index([sent_at])
+  @@index([status])
+}
+
+model favorites {
+  id        String   @id
+  userId    String?
+  vehicleId String
+  sessionId String?
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  vehicles  vehicles @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([userId, vehicleId])
+  @@index([userId], map: "idx_favorites_userid")
+  @@index([vehicleId], map: "idx_favorites_vehicleid")
+}
+
+model finance_applications {
+  id             String    @id
+  vehicleId      String?
+  customerName   String
+  customerEmail  String
+  customerPhone  String
+  annualIncome   Int
+  employment     String
+  creditScore    String?
+  loanAmount     Int
+  downPayment    Int
+  loanTerm       Int
+  interestRate   Float?
+  monthlyPayment Int?
+  lenderName     String?
+  status         String    @default("SUBMITTED")
+  approvedAmount Int?
+  documents      String?
+  notes          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime
+  vehicles       vehicles? @relation(fields: [vehicleId], references: [id])
+
+  @@index([status, createdAt])
+  @@index([vehicleId, status])
+}
+
+model google_reviews {
+  id           String    @id
+  reviewId     String    @unique
+  customerName String
+  rating       Int
+  content      String
+  reviewDate   DateTime
+  response     String?
+  responseDate DateTime?
+  isVisible    Boolean   @default(true)
+  syncedAt     DateTime  @default(now())
+
+  @@index([rating, isVisible])
+  @@index([reviewDate])
+}
+
+model import_export_services {
+  id                 String    @id
+  vehicleId          String?
+  customerName       String
+  customerEmail      String
+  serviceType        String
+  originCountry      String?
+  destinationCountry String?
+  customsDocuments   String?
+  status             String    @default("INITIATED")
+  estimatedCost      Int?
+  actualCost         Int?
+  completionDate     DateTime?
+  notes              String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime
+  vehicles           vehicles? @relation(fields: [vehicleId], references: [id])
+
+  @@index([status, serviceType])
+  @@index([vehicleId])
+}
+
+model inspection_services {
+  id             String    @id
+  vehicleId      String?
+  customerName   String
+  customerEmail  String
+  customerPhone  String
+  inspectionType String
+  scheduledDate  DateTime
+  completedDate  DateTime?
+  inspectorId    String?
+  reportUrl      String?
+  status         String    @default("SCHEDULED")
+  findings       String?
+  passed         Boolean?
+  certificateUrl String?
+  cost           Int
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime
+  vehicles       vehicles? @relation(fields: [vehicleId], references: [id])
+
+  @@index([scheduledDate, status])
+  @@index([vehicleId])
+}
+
+model insurance_partnerships {
+  id               String             @id
+  companyName      String
+  contactPerson    String?
+  contactEmail     String?
+  contactPhone     String?
+  coverageTypes    String
+  averagePremium   Int?
+  isActive         Boolean            @default(true)
+  commissionRate   Float?
+  apiEndpoint      String?
+  apiKey           String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime
+  insurance_quotes insurance_quotes[]
+
+  @@index([isActive])
+}
+
+model insurance_quotes {
+  id                     String                 @id
+  vehicleId              String?
+  customerId             String?
+  partnerId              String
+  customerName           String
+  customerEmail          String
+  coverageType           String
+  premium                Int
+  deductible             Int
+  validUntil             DateTime
+  status                 String                 @default("QUOTED")
+  createdAt              DateTime               @default(now())
+  insurance_partnerships insurance_partnerships @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  vehicles               vehicles?              @relation(fields: [vehicleId], references: [id])
+
+  @@index([customerId])
+  @@index([vehicleId, status])
+}
+
+model inventory_alerts {
+  id                  String                @id
+  customerEmail       String
+  customerName        String?
+  vehicleMake         String?
+  vehicleModel        String?
+  maxPrice            Int?
+  minYear             Int?
+  maxMileage          Int?
+  bodyType            String?
+  fuelType            String?
+  isActive            Boolean               @default(true)
+  lastNotified        DateTime?
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime
+  alert_notifications alert_notifications[]
+
+  @@index([isActive, customerEmail])
+  @@index([vehicleMake, vehicleModel])
+}
+
+model leads {
+  id              String    @id
+  customer_name   String
+  customer_email  String
+  customer_phone  String?
+  source          String
+  vehicle_id      String?
+  lead_type       String
+  stage           String    @default("NEW")
+  priority        String    @default("MEDIUM")
+  score           Int?      @default(0)
+  score_breakdown Json?
+  assigned_to     String?
+  last_contact    DateTime? @db.Timestamptz(6)
+  next_follow_up  DateTime? @db.Timestamptz(6)
+  notes           String?
+  value           Int?
+  probability     Int?
+  metadata        Json?
+  closed_at       DateTime? @db.Timestamptz(6)
+  loss_reason     String?
+  created_at      DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@index([customer_email])
+  @@index([next_follow_up])
+  @@index([score])
+  @@index([source, created_at])
+  @@index([stage, assigned_to])
+}
+
+model leads_tracking {
+  id            String    @id
+  customerName  String
+  customerEmail String
+  customerPhone String?
+  source        String
+  vehicleId     String?
+  leadType      String
+  stage         String    @default("NEW")
+  priority      String    @default("MEDIUM")
+  assignedTo    String?
+  lastContact   DateTime?
+  nextFollowUp  DateTime?
+  notes         String?
+  value         Int?
+  probability   Int?
+  closedAt      DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime
+  vehicles      vehicles? @relation(fields: [vehicleId], references: [id])
+
+  @@index([customerEmail])
+  @@index([source, createdAt])
+  @@index([stage, assignedTo])
+}
+
+model live_chat_sessions {
+  id            String    @id
+  sessionId     String    @unique
+  customerName  String?
+  customerEmail String?
+  vehicleId     String?
+  agentId       String?
+  status        String    @default("ACTIVE")
+  startedAt     DateTime  @default(now())
+  endedAt       DateTime?
+  rating        Int?
+  transcript    String?
+  vehicles      vehicles? @relation(fields: [vehicleId], references: [id])
+
+  @@index([status, startedAt])
+  @@index([vehicleId])
+}
+
+model market_insights {
+  id          String    @id
+  title       String
+  reportType  String
+  data        String
+  summary     String
+  insights    String
+  chartImages String?
+  isPublished Boolean   @default(false)
+  publishedAt DateTime?
+  views       Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime
+
+  @@index([publishedAt])
+  @@index([reportType, isPublished])
+}
+
+model notifications {
+  id           String    @id
+  user_id      String?
+  type         String
+  category     String
+  title        String
+  message      String
+  action_url   String?
+  action_label String?
+  is_read      Boolean   @default(false)
+  read_at      DateTime? @db.Timestamptz(6)
+  priority     String    @default("NORMAL")
+  metadata     Json?
+  expires_at   DateTime? @db.Timestamptz(6)
+  created_at   DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@index([created_at])
+  @@index([type, category])
+  @@index([user_id, is_read])
+}
+
+model parts_catalog {
+  id          String   @id
+  partNumber  String   @unique
+  name        String
+  description String?
+  category    String
+  brand       String?
+  price       Int
+  cost        Int?
+  stockLevel  Int      @default(0)
+  minStock    Int      @default(1)
+  supplier    String?
+  isActive    Boolean  @default(true)
+  images      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime
+
+  @@index([category, isActive])
+  @@index([stockLevel])
+}
+
+model price_notifications {
+  id            String    @id
+  vehicleId     String
+  customerEmail String
+  originalPrice Int
+  targetPrice   Int
+  isActive      Boolean   @default(true)
+  notifiedAt    DateTime?
+  createdAt     DateTime  @default(now())
+  vehicles      vehicles  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([customerEmail])
+  @@index([vehicleId, isActive])
+}
+
+model pricing_rules {
+  id            String    @id
+  name          String
+  description   String?
+  rule_type     String
+  conditions    Json
+  adjustment    Json
+  priority      Int       @default(0)
+  is_active     Boolean   @default(true)
+  valid_from    DateTime? @db.Timestamptz(6)
+  valid_until   DateTime? @db.Timestamptz(6)
+  applied_count Int       @default(0)
+  metadata      Json?
+  created_at    DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@index([is_active, priority])
+  @@index([rule_type])
+  @@index([valid_from, valid_until])
+}
+
+model promotions {
+  id                    String   @id
+  code                  String   @unique
+  name                  String
+  description           String?
+  type                  String
+  discount_value        Int
+  conditions            Json?
+  max_uses              Int?
+  used_count            Int      @default(0)
+  max_uses_per_customer Int?
+  is_active             Boolean  @default(true)
+  start_date            DateTime @db.Timestamptz(6)
+  end_date              DateTime @db.Timestamptz(6)
+  applicable_vehicles   String?
+  metadata              Json?
+  created_at            DateTime @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([code])
+  @@index([is_active, start_date, end_date])
+  @@index([type])
+}
+
+model recently_viewed {
+  id        String   @id
+  vehicleId String
+  userId    String?
+  sessionId String?
+  viewedAt  DateTime @default(now())
+  vehicles  vehicles @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, viewedAt])
+  @@index([userId, viewedAt])
+  @@index([vehicleId])
+}
+
+model rental_leasing {
+  id               String   @id
+  vehicleId        String
+  customerName     String
+  customerEmail    String
+  customerPhone    String
+  contractType     String
+  startDate        DateTime
+  endDate          DateTime
+  dailyRate        Int?
+  monthlyRate      Int?
+  totalCost        Int
+  deposit          Int
+  mileageLimit     Int?
+  status           String   @default("ACTIVE")
+  contractUrl      String?
+  insuranceCovered Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime
+  vehicles         vehicles @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([startDate, endDate])
+  @@index([vehicleId, status])
+}
+
+model sales_pipeline {
+  id            String    @id
+  leadId        String?
+  vehicleId     String?
+  customerName  String
+  customerEmail String
+  dealValue     Int
+  stage         String    @default("PROSPECT")
+  probability   Int       @default(25)
+  expectedClose DateTime?
+  actualClose   DateTime?
+  salesperson   String?
+  commission    Int?
+  lossReason    String?
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime
+  vehicles      vehicles? @relation(fields: [vehicleId], references: [id])
+
+  @@index([expectedClose])
+  @@index([stage, salesperson])
+}
+
+model saved_searches {
+  id            String    @id
+  userId        String?
+  sessionId     String?
+  name          String?
+  searchParams  String
+  alertsEnabled Boolean   @default(false)
+  lastAlert     DateTime?
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime
+
+  @@index([sessionId, isActive])
+  @@index([userId, isActive])
+}
+
+model service_appointments {
+  id                  String               @id
+  vehicleId           String?
+  customerName        String
+  customerEmail       String
+  customerPhone       String
+  serviceType         String
+  description         String?
+  scheduledDate       DateTime
+  scheduledTime       String
+  duration            Int                  @default(60)
+  status              String               @default("SCHEDULED")
+  technicianId        String?
+  estimatedCost       Int?
+  actualCost          Int?
+  notes               String?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime
+  service_technicians service_technicians? @relation(fields: [technicianId], references: [id])
+  vehicles            vehicles?            @relation(fields: [vehicleId], references: [id])
+  service_history     service_history[]
+
+  @@index([scheduledDate, status])
+  @@index([technicianId, scheduledDate])
+  @@index([vehicleId, status])
+}
+
+model service_history {
+  id                   String                @id
+  vehicleId            String?
+  appointmentId        String?
+  technicianId         String?
+  serviceType          String
+  description          String
+  partsUsed            String?
+  laborHours           Float?
+  partsTotal           Int?
+  laborTotal           Int?
+  totalCost            Int
+  warranty             String?
+  nextServiceDue       DateTime?
+  completedAt          DateTime              @default(now())
+  createdAt            DateTime              @default(now())
+  service_appointments service_appointments? @relation(fields: [appointmentId], references: [id])
+  service_technicians  service_technicians?  @relation(fields: [technicianId], references: [id])
+  vehicles             vehicles?             @relation(fields: [vehicleId], references: [id])
+
+  @@index([serviceType, completedAt])
+  @@index([vehicleId, completedAt])
+}
+
+model service_photos {
+  id          String    @id
+  vehicleId   String?
+  serviceType String
+  category    String
+  imageUrl    String
+  description String?
+  uploadedBy  String?
+  tags        String?
+  createdAt   DateTime  @default(now())
+  vehicles    vehicles? @relation(fields: [vehicleId], references: [id])
+
+  @@index([category, serviceType])
+  @@index([vehicleId, serviceType])
+}
+
+model service_technicians {
+  id                   String                 @id
+  name                 String
+  email                String                 @unique
+  phone                String?
+  specializations      String
+  isActive             Boolean                @default(true)
+  hourlyRate           Int?
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime
+  service_appointments service_appointments[]
+  service_history      service_history[]
+
+  @@index([isActive])
+}
+
+model sms_campaigns {
+  id               String    @id
+  name             String
+  message          String
+  phone_numbers    String
+  recipient_count  Int       @default(0)
+  status           String    @default("DRAFT")
+  scheduled_for    DateTime? @db.Timestamptz(6)
+  sent_at          DateTime? @db.Timestamptz(6)
+  delivery_rate    Float?
+  click_rate       Float?
+  cost             Float?
+  segment_criteria Json?
+  tags             String?
+  created_at       DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@index([scheduled_for])
+  @@index([sent_at])
+  @@index([status])
+}
+
+model social_media_posts {
+  id               String    @id
+  platform         String
+  content          String
+  media_urls       String?
+  status           String    @default("DRAFT")
+  scheduled_for    DateTime? @db.Timestamptz(6)
+  published_at     DateTime? @db.Timestamptz(6)
+  platform_post_id String?
+  impressions      Int       @default(0)
+  engagements      Int       @default(0)
+  clicks           Int       @default(0)
+  shares           Int       @default(0)
+  comments         Int       @default(0)
+  likes            Int       @default(0)
+  engagement_rate  Float?
+  target_audience  Json?
+  hashtags         String?
+  tags             String?
+  created_at       DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@index([platform, status])
+  @@index([published_at])
+  @@index([scheduled_for])
+}
+
+model testimonials {
+  id            String    @id
+  vehicleId     String?
+  customerName  String
+  customerEmail String?
+  rating        Int
+  title         String?
+  content       String
+  photos        String?
+  isVerified    Boolean   @default(false)
+  isApproved    Boolean   @default(false)
+  isPublic      Boolean   @default(true)
+  location      String?
+  purchaseDate  DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime
+  vehicles      vehicles? @relation(fields: [vehicleId], references: [id])
+
+  @@index([isApproved, isPublic, rating])
+  @@index([vehicleId, isApproved])
+}
+
+model trade_in_valuations {
+  id                String    @id
+  customerName      String
+  customerEmail     String
+  customerPhone     String?
+  vehicleMake       String
+  vehicleModel      String
+  vehicleYear       Int
+  vehicleMileage    Int
+  vehicleCondition  String
+  vehiclePhotos     String?
+  hasAccidents      Boolean   @default(false)
+  hasServiceHistory Boolean   @default(false)
+  marketValue       Int?
+  offerValue        Int?
+  status            String    @default("SUBMITTED")
+  appraisedBy       String?
+  notes             String?
+  expiresAt         DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime
+
+  @@index([customerEmail])
+  @@index([status, createdAt])
+}
+
+model translations {
+  id          String    @id
+  locale      String
+  namespace   String
+  key         String
+  value       String
+  description String?
+  is_approved Boolean   @default(false)
+  approved_by String?
+  approved_at DateTime? @db.Timestamptz(6)
+  metadata    Json?
+  created_at  DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@unique([locale, namespace, key])
+  @@index([is_approved])
+  @@index([locale, namespace])
+}
+
+model vehicle_comparisons {
+  id         String   @id
+  userId     String?
+  sessionId  String?
+  vehicleIds String
+  name       String?
+  isShared   Boolean  @default(false)
+  shareToken String?  @unique
+  views      Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime
+
+  @@index([sessionId])
+  @@index([shareToken])
+  @@index([userId, createdAt])
+}
+
+model vehicle_inquiries {
+  id          String   @id
+  vehicleId   String
+  name        String
+  email       String
+  phone       String
+  message     String?
+  inquiryType String   @default("GENERAL")
+  status      String   @default("NEW")
+  clientIP    String?
+  fingerprint String?
+  createdAt   DateTime @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime @default(now()) @db.Timestamp(6)
+  vehicles    vehicles @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([vehicleId], map: "idx_vehicle_inquiries_vehicleid")
+  @@index([vehicleId, status])
+}
+
+model vehicles {
+  id                     String                   @id
+  slug                   String?                  @unique
+  make                   String
+  model                  String
+  year                   Int
+  price                  Int
+  mileage                Int
+  fuelType               String
+  transmission           String
+  bodyType               String
+  color                  String
+  engineSize             String
+  drivetrain             String
+  features               String
+  images                 String
+  description            String
+  featured               Boolean                  @default(false)
+  status                 String                   @default("AVAILABLE")
+  vin                    String?                  @unique
+  doors                  Int?
+  seats                  Int?
+  createdAt              DateTime                 @default(now()) @db.Timestamp(6)
+  updatedAt              DateTime                 @default(now()) @db.Timestamp(6)
+  createdBy              String?
+  alert_notifications    alert_notifications[]
+  customer_stories       customer_stories[]
+  customization_services customization_services[]
+  detailing_services     detailing_services[]
+  favorites              favorites[]
+  finance_applications   finance_applications[]
+  import_export_services import_export_services[]
+  inspection_services    inspection_services[]
+  insurance_quotes       insurance_quotes[]
+  leads_tracking         leads_tracking[]
+  live_chat_sessions     live_chat_sessions[]
+  price_notifications    price_notifications[]
+  recently_viewed        recently_viewed[]
+  rental_leasing         rental_leasing[]
+  sales_pipeline         sales_pipeline[]
+  service_appointments   service_appointments[]
+  service_history        service_history[]
+  service_photos         service_photos[]
+  testimonials           testimonials[]
+  vehicle_inquiries      vehicle_inquiries[]
+  video_walkarounds      video_walkarounds[]
+  virtual_tours          virtual_tours[]
+  warranty_options       warranty_options[]
+
+  @@index([createdBy], map: "idx_vehicles_createdby")
+  @@index([featured, status])
+  @@index([make, model, year, status])
+  @@index([price, status])
+}
+
+model video_walkarounds {
+  id           String   @id
+  vehicleId    String
+  title        String
+  videoUrl     String
+  thumbnailUrl String?
+  duration     Int?
+  views        Int      @default(0)
+  isActive     Boolean  @default(true)
+  category     String?
+  createdAt    DateTime @default(now())
+  vehicles     vehicles @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
   @@index([category])
-  @@index([featured])
-  @@index([priceEur])
-  @@index([year])
-  @@index([createdAt])
-  @@map("cars")
+  @@index([vehicleId, isActive])
 }
 
-model CarImage {
-  id        String   @id @default(cuid())
-  carId     String
-  url       String
-  altText   String?
-  order     Int      @default(0)
-  isPrimary Boolean  @default(false)
-
+model virtual_tours {
+  id        String   @id
+  vehicleId String
+  name      String
+  images    String
+  hotspots  String?
+  isActive  Boolean  @default(true)
+  viewCount Int      @default(0)
   createdAt DateTime @default(now())
+  updatedAt DateTime
+  vehicles  vehicles @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
 
-  car       Car      @relation(fields: [carId], references: [id], onDelete: Cascade)
-
-  @@index([carId])
-  @@index([isPrimary])
-  @@map("car_images")
+  @@index([vehicleId, isActive])
 }
 
-model CarFeature {
-  id        String   @id @default(cuid())
-  carId     String
-  feature   String
-  order     Int      @default(0)
+model warranty_options {
+  id           String    @id
+  vehicleId    String?
+  name         String
+  description  String
+  duration     Int
+  mileageLimit Int?
+  price        Int
+  coverage     String
+  terms        String
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime
+  vehicles     vehicles? @relation(fields: [vehicleId], references: [id])
 
-  car       Car      @relation(fields: [carId], references: [id], onDelete: Cascade)
-
-  @@index([carId])
-  @@map("car_features")
+  @@index([vehicleId, isActive])
 }
 
-model CarSpecification {
-  id        String   @id @default(cuid())
-  carId     String
-  label     String
-  value     String
-  order     Int      @default(0)
 
-  car       Car      @relation(fields: [carId], references: [id], onDelete: Cascade)
-
-  @@index([carId])
-  @@map("car_specifications")
-}
-
-enum FuelType {
-  DIESEL
-  PETROL
-  ELECTRIC
-  HYBRID
-  PLUGIN_HYBRID
-}
-
-enum TransmissionType {
-  AUTOMATIC
-  MANUAL
-  SEMI_AUTOMATIC
-}
-
-enum DriveType {
-  FWD  // Front-wheel drive
-  RWD  // Rear-wheel drive
-  AWD  // All-wheel drive
-  FOUR_WD // 4x4
-}
+// Added minimal Car models to satisfy application code (app/lib/db/cars.ts)
+// These coexist with existing 'vehicles' model.
 
 enum CarStatus {
   AVAILABLE
-  RESERVED
   SOLD
-  COMING_SOON
-  UNDER_MAINTENANCE
-}
-
-enum CarCondition {
-  EXCELLENT
-  GOOD
-  FAIR
-  NEEDS_WORK
+  PENDING
+  HIDDEN
 }
 
 enum CarCategory {
-  PREMIUM
-  FAMILY
+  SEDAN
   SUV
-  COMPACT
-  SPORTS
-  LUXURY
-  ELECTRIC
+  HATCHBACK
+  TRUCK
+  VAN
+  COUPE
+  OTHER
 }
 
-// ================================
-// LEAD & CONTACT MANAGEMENT
-// ================================
-
-model ContactSubmission {
-  id        String   @id @default(cuid())
-
-  // Contact Information
-  name      String
-  email     String
-  phone     String?
-  message   String   @db.Text
-
-  // Lead Information
-  leadScore Int      @default(0)
-  source    String   @default("contact_form")
-  status    LeadStatus @default(NEW)
-  priority  LeadPriority @default(MEDIUM)
-
-  // Related Car (if inquiry about specific car)
-  carId     String?
-  car       Car?     @relation(fields: [carId], references: [id], onDelete: SetNull)
-
-  // Assignment
-  assignedToId String?
-  assignedTo   User?   @relation(fields: [assignedToId], references: [id], onDelete: SetNull, name: "AssignedLeads")
-
-  // Metadata
-  ip        String?
-  userAgent String?  @db.Text
-
-  // Timestamps
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  respondedAt  DateTime?
-  closedAt     DateTime?
-
-  // Relations
-  notes        ContactNote[]
-  activities   ContactActivity[]
-
-  @@index([email])
-  @@index([status])
-  @@index([leadScore])
-  @@index([createdAt])
-  @@index([carId])
-  @@map("contact_submissions")
+model Car {
+  id                 String             @id @default(cuid())
+  slug               String             @unique
+  name               String
+  brand              String
+  model              String
+  priceEur           Int
+  year               Int
+  kmNumber           Int
+  fuel               String
+  transmission       String
+  description        String
+  detailedDescription String?
+  condition          String?
+  category           CarCategory
+  status             CarStatus          @default(AVAILABLE)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  images             CarImage[]
+  features           CarFeature[]
+  specifications     CarSpecification[]
+  views              CarView[]
 }
 
-model ContactNote {
-  id        String   @id @default(cuid())
-  contactId String
-  userId    String
-  note      String   @db.Text
-
-  createdAt DateTime @default(now())
-
-  contact   ContactSubmission @relation(fields: [contactId], references: [id], onDelete: Cascade)
-  user      User              @relation(fields: [userId], references: [id], name: "ContactNotes")
-
-  @@index([contactId])
-  @@map("contact_notes")
+model CarImage {
+  id        String  @id @default(cuid())
+  carId     String
+  url       String
+  isPrimary Boolean @default(false)
+  order     Int     @default(0)
+  car       Car     @relation(fields: [carId], references: [id], onDelete: Cascade)
+  @@index([carId, order])
 }
 
-model ContactActivity {
-  id        String   @id @default(cuid())
-  contactId String
-  type      ActivityType
-  description String @db.Text
-  metadata  Json?
-
-  createdAt DateTime @default(now())
-
-  contact   ContactSubmission @relation(fields: [contactId], references: [id], onDelete: Cascade)
-
-  @@index([contactId])
-  @@index([type])
-  @@index([createdAt])
-  @@map("contact_activities")
+model CarFeature {
+  id     String @id @default(cuid())
+  carId  String
+  feature String
+  order  Int    @default(0)
+  car    Car    @relation(fields: [carId], references: [id], onDelete: Cascade)
+  @@index([carId, order])
 }
 
-enum LeadStatus {
-  NEW
-  CONTACTED
-  QUALIFIED
-  NEGOTIATING
-  CONVERTED
-  LOST
-  SPAM
+model CarSpecification {
+  id     String @id @default(cuid())
+  carId  String
+  label  String
+  value  String
+  order  Int    @default(0)
+  car    Car    @relation(fields: [carId], references: [id], onDelete: Cascade)
+  @@index([carId, order])
 }
-
-enum LeadPriority {
-  LOW
-  MEDIUM
-  HIGH
-  URGENT
-}
-
-enum ActivityType {
-  EMAIL_SENT
-  PHONE_CALL
-  MEETING
-  NOTE_ADDED
-  STATUS_CHANGED
-  CAR_SHOWN
-  TEST_DRIVE
-}
-
-// ================================
-// NEWSLETTER & MARKETING
-// ================================
-
-model NewsletterSubscriber {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  status    SubscriptionStatus @default(ACTIVE)
-  source    String?
-
-  // Preferences
-  preferences Json?
-
-  // Timestamps
-  subscribedAt   DateTime @default(now())
-  unsubscribedAt DateTime?
-  lastEmailSent  DateTime?
-
-  @@index([email])
-  @@index([status])
-  @@map("newsletter_subscribers")
-}
-
-enum SubscriptionStatus {
-  ACTIVE
-  UNSUBSCRIBED
-  BOUNCED
-}
-
-// ================================
-// ANALYTICS & TRACKING
-// ================================
 
 model CarView {
   id        String   @id @default(cuid())
   carId     String
-
-  // User Information
   ip        String?
-  userAgent String?  @db.Text
-  referrer  String?  @db.Text
-
-  // Session
+  userAgent String?
+  referrer  String?
   sessionId String?
-
-  createdAt DateTime @default(now())
-
-  car       Car      @relation(fields: [carId], references: [id], onDelete: Cascade)
-
-  @@index([carId])
-  @@index([createdAt])
-  @@map("car_views")
-}
-
-model PageView {
-  id        String   @id @default(cuid())
-  path      String
-
-  // User Information
-  ip        String?
-  userAgent String?  @db.Text
-  referrer  String?  @db.Text
-
-  // Performance
-  loadTime  Int?     // in milliseconds
-
-  createdAt DateTime @default(now())
-
-  @@index([path])
-  @@index([createdAt])
-  @@map("page_views")
-}
-
-model WebVital {
-  id        String   @id @default(cuid())
-  name      String   // CLS, FID, FCP, LCP, TTFB
-  value     Float
-  rating    String   // good, needs-improvement, poor
-
-  // Page Information
-  path      String
-
-  // User Information
-  userAgent String?  @db.Text
-
-  createdAt DateTime @default(now())
-
-  @@index([name])
-  @@index([path])
-  @@index([createdAt])
-  @@map("web_vitals")
-}
-
-// ================================
-// ACTIVITY LOGGING
-// ================================
-
-model ActivityLog {
-  id        String   @id @default(cuid())
-  userId    String
-  action    String
-  entity    String   // e.g., "car", "contact", "user"
-  entityId  String?
-  metadata  Json?
-
-  createdAt DateTime @default(now())
-
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([entity])
-  @@index([createdAt])
-  @@map("activity_logs")
-}
-
-// ================================
-// SYSTEM CONFIGURATION
-// ================================
-
-model SystemConfig {
-  id        String   @id @default(cuid())
-  key       String   @unique
-  value     Json
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("system_config")
+  createdAt DateTime  @default(now())
+  car       Car       @relation(fields: [carId], references: [id], onDelete: Cascade)
+  @@index([carId, createdAt])
 }

@@ -12,6 +12,9 @@ export const dynamic = 'force-dynamic';
  */
 export async function generateStaticParams() {
   try {
+    if (!process.env.DATABASE_URL) {
+      return [];
+    }
     const { cars } = await import('@/app/lib/db/cars').then(async (module) => {
       const result = await module.getAllCars({}, { limit: 1000 });
       return result;

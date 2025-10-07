@@ -12,7 +12,8 @@ model User {
   id               String              @id @default(cuid())
   email            String              @unique
   username         String              @unique
-  password         String              // Changed from passwordHash for compatibility
+  password         String?             @default("")  // Made optional with default for migration compatibility
+  passwordHash     String?             // Keep existing field
   name             String?             // Added for compatibility
   firstName        String?
   lastName         String?

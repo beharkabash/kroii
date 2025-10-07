@@ -6,6 +6,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { getPlaceholder } from '../lib/image-placeholder';
+import Testimonials from './Testimonials';
+import FinancingCalculator from './FinancingCalculator';
 
 interface Car {
   id: string;
@@ -77,9 +79,10 @@ export default function HomeContent({ cars }: HomeContentProps) {
             </motion.div>
 
             <div className="hidden md:flex space-x-8">
-              <a href="#cars" className="text-slate-700 hover:text-purple-600 transition font-medium">Autot</a>
-              <a href="#about" className="text-slate-700 hover:text-purple-600 transition font-medium">Meistä</a>
-              <a href="#contact" className="text-slate-700 hover:text-purple-600 transition font-medium">Ota yhteyttä</a>
+              <Link href="/cars" className="text-slate-700 hover:text-purple-600 transition font-medium">Autot</Link>
+              <Link href="/about" className="text-slate-700 hover:text-purple-600 transition font-medium">Meistä</Link>
+              <Link href="/testimonials" className="text-slate-700 hover:text-purple-600 transition font-medium">Arvostelut</Link>
+              <Link href="/contact" className="text-slate-700 hover:text-purple-600 transition font-medium">Ota yhteyttä</Link>
             </div>
 
             <div className="flex items-center space-x-4">
@@ -106,27 +109,34 @@ export default function HomeContent({ cars }: HomeContentProps) {
             className="fixed top-16 left-0 right-0 bg-white/95 backdrop-blur-md z-40 shadow-lg md:hidden"
           >
             <div className="px-4 py-6 space-y-4">
-              <a
-                href="#cars"
+              <Link
+                href="/cars"
                 onClick={() => setMobileMenuOpen(false)}
                 className="block text-slate-700 hover:text-purple-600 transition font-medium py-2"
               >
                 Autot
-              </a>
-              <a
-                href="#about"
+              </Link>
+              <Link
+                href="/about"
                 onClick={() => setMobileMenuOpen(false)}
                 className="block text-slate-700 hover:text-purple-600 transition font-medium py-2"
               >
                 Meistä
-              </a>
-              <a
-                href="#contact"
+              </Link>
+              <Link
+                href="/testimonials"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block text-slate-700 hover:text-purple-600 transition font-medium py-2"
+              >
+                Arvostelut
+              </Link>
+              <Link
+                href="/contact"
                 onClick={() => setMobileMenuOpen(false)}
                 className="block text-slate-700 hover:text-purple-600 transition font-medium py-2"
               >
                 Ota yhteyttä
-              </a>
+              </Link>
               <a
                 href="tel:+358413188214"
                 className="block text-purple-600 hover:text-purple-700 transition font-medium py-2"
@@ -163,22 +173,28 @@ export default function HomeContent({ cars }: HomeContentProps) {
                 Meiltä löydät suuren valikoiman laadukkaita käytettyjä autoja. Yli 15 vuoden kokemus takaa luotettavan palvelun.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <motion.a
-                  href="#contact"
+                <motion.div
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-lg font-semibold shadow-lg hover:shadow-purple-500/50 transition text-center"
                 >
-                  Ota yhteyttä
-                </motion.a>
-                <motion.a
-                  href="#cars"
+                  <Link
+                    href="/contact"
+                    className="block px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-lg font-semibold shadow-lg hover:shadow-purple-500/50 transition text-center"
+                  >
+                    Ota yhteyttä
+                  </Link>
+                </motion.div>
+                <motion.div
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white border-2 border-white/30 rounded-lg font-semibold hover:bg-white/20 transition text-center"
                 >
-                  Myynnissä olevat autot
-                </motion.a>
+                  <Link
+                    href="/cars"
+                    className="block px-8 py-4 bg-white/10 backdrop-blur-sm text-white border-2 border-white/30 rounded-lg font-semibold hover:bg-white/20 transition text-center"
+                  >
+                    Myynnissä olevat autot
+                  </Link>
+                </motion.div>
               </div>
             </div>
             <motion.div
@@ -337,6 +353,10 @@ export default function HomeContent({ cars }: HomeContentProps) {
           </div>
         </div>
       </section>
+
+      <Testimonials limit={6} showTitle={true} />
+
+      <FinancingCalculator className="py-16 bg-slate-50" />
 
       <section id="contact" className="py-20 bg-slate-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

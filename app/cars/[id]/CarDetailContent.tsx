@@ -6,6 +6,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { getPlaceholder } from '@/app/lib/image-placeholder';
+import Testimonials from '@/app/components/Testimonials';
+import FinancingCalculator from '@/app/components/FinancingCalculator';
+import TestDriveScheduler from '@/app/components/TestDriveScheduler';
 
 interface CarImage {
   url: string;
@@ -356,6 +359,28 @@ export function CarDetailContent({ car, relatedCars }: CarDetailContentProps) {
           </motion.div>
         </div>
       </section>
+
+      {/* Vehicle-Specific Testimonials */}
+      <Testimonials vehicleId={car.id} limit={3} showTitle={true} className="py-16 bg-slate-50" />
+
+      {/* Financing Calculator */}
+      <FinancingCalculator
+        vehiclePrice={car.priceEur}
+        vehicleName={car.name}
+        className="py-16 bg-white"
+      />
+
+      {/* Test Drive Scheduler */}
+      <TestDriveScheduler
+        vehicleId={car.id}
+        vehicleInfo={{
+          make: car.brand,
+          model: car.model,
+          year: typeof car.year === 'string' ? parseInt(car.year) : car.year,
+          image: car.images?.[0]?.url
+        }}
+        className="py-16 bg-slate-50"
+      />
 
       {/* Contact Section */}
       <section className="py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white">

@@ -6,9 +6,9 @@
 import { PrismaClient } from '@prisma/client';
 import { createPrismaClient, checkDatabaseHealth, DATABASE_CONFIG } from './config';
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
-};
+// This prevents hot-reloading in development from creating multiple instances.
+// In production, it simply creates one instance.
+const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
 // Use optimized client configuration
 export const prisma = globalForPrisma.prisma ?? createPrismaClient();

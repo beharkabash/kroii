@@ -6,6 +6,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAllCars, CarFilters, PaginationOptions } from '@/app/lib/db/cars';
 import { CarCategory, CarStatus } from '@prisma/client';
+import { cacheApiResponse } from '@/app/lib/cache';
+import { CACHE_KEYS, CACHE_DURATION } from '@/app/lib/redis';
 
 export async function GET(request: NextRequest) {
   try {
@@ -60,13 +62,15 @@ export async function GET(request: NextRequest) {
       filters.search = searchParams.get('search')!;
     }
 
-    // Get cars with pagination
-    const result = await getAllCars(filters, {
-      page,
-      limit,
-      sortBy,
-      sortOrder
-    });
+    // Create cache key based on filters and pagination
+    const cacheKey = `${CACHE_KEYS.CARS_ALL}:${JSON.stringify({ filters, page, limit, sortBy, sortOrder })}`;
+
+    // Get cars with pagination (with caching)
+    const result = await cacheApiResponse(
+      cacheKey,
+      async () => getAllCars(filters, { page, limit, sortBy, sortOrder }),
+      CACHE_DURATION.MEDIUM
+    );
 
     return NextResponse.json({
       success: true,

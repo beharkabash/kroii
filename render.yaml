@@ -1,0 +1,89 @@
+services:
+  - type: web
+    name: kroi-auto-center
+    runtime: node
+    plan: starter
+    region: frankfurt
+    branch: main
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_TELEMETRY_DISABLED
+        value: "1"
+
+      # Shared Sanity CMS Configuration
+      - key: NEXT_PUBLIC_SANITY_PROJECT_ID
+        value: j2t31xge
+      - key: NEXT_PUBLIC_SANITY_DATASET
+        value: production
+      - key: SANITY_API_TOKEN
+        value: skVALaMvvJIxP9krYTpB6SYM6XgH3fe60cDRTpVg05znY5DlDGIx1LvUMre94xah8O1bk6ZIiz5QwNz7aA6B5XisFj8mWid17JAgnWh5tuncOehX5gsYt2oNpVxfpS9xsa1YWxHCjMUxkwGeeH9bynKZGz5OQFwIeNARmmN3ajJCCEfgMUiO
+
+      - key: DATABASE_URL
+        fromDatabase:
+          name: kroi-auto-db
+          property: connectionString
+      - key: NEXTAUTH_SECRET
+        generateValue: true
+      - key: NEXTAUTH_URL
+        value: https://kroi-auto-center.onrender.com
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: kroi-redis
+          property: connectionString
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_FROM
+        value: noreply@kroiautocenter.fi
+      - key: WEBHOOK_SECRET
+        generateValue: true
+      - key: NEXT_PUBLIC_SITE_URL
+        value: https://kroi-auto-center.onrender.com
+      - key: NEXT_PUBLIC_GA_ID
+        value: # Add your Google Analytics ID
+      - key: SENTRY_DSN
+        value: # Add your Sentry DSN
+      - key: SMTP_USER
+        value: kroiautocenter@gmail.com
+      - key: SMTP_PASS
+        value: # Add your Gmail App Password here
+    domains:
+      - kroiautocenter.fi
+      - www.kroiautocenter.fi
+    autoDeploy: true
+    rootDir: ./
+    scaling:
+      minInstances: 1
+      maxInstances: 3
+
+  - type: redis
+    name: kroi-redis
+    plan: starter
+    maxmemoryPolicy: allkeys-lru
+    region: frankfurt
+
+databases:
+  - name: kroi-auto-db
+    databaseName: kroi_auto_center
+    plan: starter
+    region: frankfurt
+    user: kroi_user
+    postgresMajorVersion: "15"
+    ipAllowList: [] # Allow all IPs for now
+
+# Static site for legacy redirects (optional)
+# - type: static
+#   name: kroi-redirects
+#   staticPublishPath: ./public/redirects
+#   buildCommand: echo "Static redirects ready"
+#   routes:
+#     - type: redirect
+#       source: /old-path
+#       destination: /new-path
+#       type: permanent

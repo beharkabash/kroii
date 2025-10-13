@@ -4,6 +4,12 @@ import "./globals.css";
 import { Analytics } from "./components/Analytics";
 import { WebVitals } from "./components/WebVitals";
 import { ServiceWorkerRegister } from "./components/ServiceWorkerRegister";
+import PWAInstallPrompt from "./components/PWAInstallPrompt";
+import PWAStatus from "./components/PWAStatus";
+import ComparisonWidget from "./components/ComparisonWidget";
+import WhatsAppChat from "./components/WhatsAppChat";
+import { SEOGenerator } from "./lib/seo-utils";
+import { TranslationProvider } from "./lib/i18n/provider";
 import { Suspense } from "react";
 
 const geistSans = Geist({
@@ -45,26 +51,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "AutoDealer",
-    "name": "Kroi Auto Center Oy",
-    "description": "Laadukkaita käytettyjä autoja Helsingissä. Yli 15 vuoden kokemus autojen myynnistä.",
-    "url": "https://kroiautocenter.fi",
-    "telephone": "+358413188214",
-    "email": "kroiautocenter@gmail.com",
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": "Läkkisepäntie 15 B 300620",
-      "addressLocality": "Helsinki",
-      "addressCountry": "FI"
-    },
-    "openingHours": "Mo-Fr 10:00-18:00, Sa 11:00-17:00",
-    "sameAs": [
-      "https://www.facebook.com/people/Kroi-Auto-Center-Oy/61561550627512/",
-      "https://www.instagram.com/kroiautocenteroy"
-    ]
-  };
+  // Generate comprehensive structured data
+  const autoDealerData = SEOGenerator.generateCarDealerJSONLD();
+  const websiteData = SEOGenerator.generateWebsiteJSONLD();
+  const localBusinessData = SEOGenerator.generateLocalBusinessJSONLD();
 
   return (
     <html lang="fi" className={`${geistSans.variable} ${geistMono.variable}`}>
@@ -80,9 +70,23 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Kroi Auto" />
+        <link rel="apple-touch-icon" href="/icon-192.png" />
+        <meta name="application-name" content="Kroi Auto Center" />
+        <meta name="msapplication-TileColor" content="#9333ea" />
+        <meta name="msapplication-config" content="/browserconfig.xml" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="format-detection" content="telephone=yes" />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(autoDealerData) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteData) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessData) }}
         />
       </head>
       <body className="antialiased">
@@ -91,7 +95,13 @@ export default function RootLayout({
           <Analytics />
         </Suspense>
         <WebVitals />
-        {children}
+        <PWAStatus />
+        <PWAInstallPrompt />
+        <ComparisonWidget />
+        <WhatsAppChat />
+        <TranslationProvider>
+          {children}
+        </TranslationProvider>
       </body>
     </html>
   );

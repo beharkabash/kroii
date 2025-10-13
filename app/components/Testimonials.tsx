@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Star, Quote, User, Calendar, MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
@@ -43,11 +43,7 @@ export default function Testimonials({
   const [loading, setLoading] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  useEffect(() => {
-    fetchTestimonials();
-  }, [vehicleId, limit]);
-
-  const fetchTestimonials = async () => {
+  const fetchTestimonials = useCallback(async () => {
     try {
       const params = new URLSearchParams();
       if (vehicleId) params.set('vehicleId', vehicleId);
@@ -64,20 +60,11 @@ export default function Testimonials({
     } finally {
       setLoading(false);
     }
-  };
+  }, [vehicleId, limit]);
 
-  const renderStars = (rating: number) => {
-    return Array.from({ length: 5 }).map((_, index) => (
-      <Star
-        key={index}
-        className={`h-4 w-4 ${
-          index < rating
-            ? 'text-yellow-400 fill-current'
-            : 'text-slate-300'
-        }`}
-      />
-    ));
-  };
+  useEffect(() => {
+    fetchTestimonials();
+  }, [fetchTestimonials]);
 
   const nextSlide = () => {
     setCurrentSlide((prev) =>
@@ -89,13 +76,6 @@ export default function Testimonials({
     setCurrentSlide((prev) =>
       prev === 0 ? testimonials.length - 1 : prev - 1
     );
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fi-FI', {
-      year: 'numeric',
-      month: 'long',
-    });
   };
 
   if (loading) {

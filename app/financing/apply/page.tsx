@@ -16,6 +16,15 @@ interface CarOption {
   slug: string;
 }
 
+interface CarApiResponse {
+  id: string;
+  brand: string;
+  model: string;
+  year: number;
+  priceEur: number;
+  slug: string;
+}
+
 export default function FinancingApplicationPage() {
   const searchParams = useSearchParams();
   const vehicleId = searchParams.get('vehicleId');
@@ -57,7 +66,7 @@ export default function FinancingApplicationPage() {
       const response = await fetch('/api/cars?limit=100');
       const result = await response.json();
       if (result.success) {
-        setCars(result.data.cars.map((car: any) => ({
+        setCars(result.data.cars.map((car: CarApiResponse) => ({
           id: car.id,
           name: `${car.brand} ${car.model} (${car.year})`,
           make: car.brand,
@@ -120,10 +129,10 @@ export default function FinancingApplicationPage() {
         },
         body: JSON.stringify({
           ...formData,
-          annualIncome: parseInt(formData.annualIncome),
-          loanAmount: parseInt(formData.loanAmount),
-          downPayment: parseInt(formData.downPayment),
-          loanTerm: parseInt(formData.loanTerm),
+          annualIncome: parseInt(String(formData.annualIncome)),
+          loanAmount: parseInt(String(formData.loanAmount)),
+          downPayment: parseInt(String(formData.downPayment)),
+          loanTerm: parseInt(String(formData.loanTerm)),
           vehicleId: formData.vehicleId || undefined,
         }),
       });
@@ -135,7 +144,7 @@ export default function FinancingApplicationPage() {
       } else {
         setError(result.error || 'Hakemuksen lähettäminen epäonnistui');
       }
-    } catch (error) {
+    } catch (_error) {
       setError('Verkkovirhe. Yritä uudelleen.');
     } finally {
       setIsSubmitting(false);

@@ -125,7 +125,7 @@ export default function TradeInEstimator({
     }, 2000);
   };
 
-  const handleInputChange = (field: string, value: string | number) => {
+  const handleInputChange = (field: string, value: string | number | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (estimate) setEstimate(null); // Clear estimate when inputs change
   };

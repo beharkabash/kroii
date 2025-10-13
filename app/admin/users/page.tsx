@@ -189,7 +189,7 @@ export default function UsersPage() {
       await fetchUsers();
       setShowEditModal(false);
       setSelectedUser(null);
-    } catch (_) { // eslint-disable-line @typescript-eslint/no-unused-vars
+    } catch (_) {  
       alert('Virhe päivittäessä käyttäjää');
     }
   };
@@ -207,7 +207,7 @@ export default function UsersPage() {
       await fetchUsers();
       setShowDeleteModal(false);
       setSelectedUserId(null);
-    } catch (_) { // eslint-disable-line @typescript-eslint/no-unused-vars
+    } catch (_) {  
       alert('Virhe poistaessa käyttäjää');
     }
   };
@@ -224,7 +224,7 @@ export default function UsersPage() {
 
       const data = await response.json();
       alert(`Uusi salasana: ${data.temporaryPassword}\nKäyttäjä saa sähköpostin uudesta salasanasta.`);
-    } catch (_) { // eslint-disable-line @typescript-eslint/no-unused-vars
+    } catch (_) {  
       alert('Virhe nollatessa salasanaa');
     }
   };

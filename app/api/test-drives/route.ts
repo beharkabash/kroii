@@ -129,36 +129,3 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Helper function to get available time slots for a specific date
-export async function getAvailableTimeSlots(date: string) {
-  const startDate = new Date(date);
-  const endDate = new Date(date);
-  endDate.setDate(endDate.getDate() + 1);
-
-  const bookedSlots = await prisma.appointments.findMany({
-    where: {
-      scheduledDate: {
-        gte: startDate,
-        lt: endDate,
-      },
-      status: {
-        not: 'CANCELLED'
-      }
-    },
-    select: {
-      scheduledTime: true,
-    }
-  });
-
-  const bookedTimes = bookedSlots.map(slot => slot.scheduledTime);
-
-  const allSlots = [
-    '09:00', '10:00', '11:00', '12:00', '13:00',
-    '14:00', '15:00', '16:00', '17:00'
-  ];
-
-  return allSlots.map(time => ({
-    time,
-    available: !bookedTimes.includes(time)
-  }));
-}

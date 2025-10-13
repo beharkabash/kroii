@@ -1,0 +1,26 @@
+app/lib/i18n/provider.tsx(52,17): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
+  No index signature with a parameter of type 'string' was found on type '{}'.
+app/lib/i18n/provider.tsx(58,21): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
+  No index signature with a parameter of type 'string' was found on type '{}'.
+app/lib/i18n/provider.tsx(73,42): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '(match: string, paramKey: any) => string | number' is not assignable to parameter of type '(substring: string, ...args: any[]) => string'.
+      Type 'string | number' is not assignable to type 'string'.
+        Type 'number' is not assignable to type 'string'.
+app/lib/inventory-alerts.ts(41,34): error TS2551: Property 'inventoryAlerts' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'inventory_alerts'?
+app/lib/inventory-alerts.ts(86,35): error TS2551: Property 'inventoryAlerts' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'inventory_alerts'?
+app/lib/inventory-alerts.ts(91,25): error TS7006: Parameter 'alert' implicitly has an 'any' type.
+app/lib/inventory-alerts.ts(118,35): error TS2551: Property 'inventoryAlerts' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'inventory_alerts'?
+app/lib/inventory-alerts.ts(126,25): error TS7006: Parameter 'alert' implicitly has an 'any' type.
+app/lib/inventory-alerts.ts(153,20): error TS2551: Property 'inventoryAlerts' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'inventory_alerts'?
+app/lib/inventory-alerts.ts(172,20): error TS2551: Property 'inventoryAlerts' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'inventory_alerts'?
+i18n.ts(10,33): error TS2345: Argument of type '({ locale }: GetRequestConfigParams) => Promise<{ messages: any; }>' is not assignable to parameter of type '(params: GetRequestConfigParams) => RequestConfig | Promise<RequestConfig>'.
+  Type 'Promise<{ messages: any; }>' is not assignable to type 'RequestConfig | Promise<RequestConfig>'.
+    Type 'Promise<{ messages: any; }>' is not assignable to type 'Promise<RequestConfig>'.
+      Type '{ messages: any; }' is not assignable to type 'RequestConfig'.
+        Property 'locale' is missing in type '{ messages: any; }' but required in type '{ locale: string; }'.
+i18n/request.ts(10,33): error TS2345: Argument of type '({ locale }: GetRequestConfigParams) => Promise<{ messages: any; }>' is not assignable to parameter of type '(params: GetRequestConfigParams) => RequestConfig | Promise<RequestConfig>'.
+  Type 'Promise<{ messages: any; }>' is not assignable to type 'RequestConfig | Promise<RequestConfig>'.
+    Type 'Promise<{ messages: any; }>' is not assignable to type 'Promise<RequestConfig>'.
+      Type '{ messages: any; }' is not assignable to type 'RequestConfig'.
+        Property 'locale' is missing in type '{ messages: any; }' but required in type '{ locale: string; }'.

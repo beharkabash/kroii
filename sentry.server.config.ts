@@ -18,7 +18,7 @@ Sentry.init({
   enabled: process.env.NODE_ENV === 'production',
 
   // Server-specific configuration
-  beforeSend(event, hint) {
+  beforeSend(event, _hint) {
     // Filter out low-priority errors
     if (event.level === 'info' || event.level === 'debug') {
       return null;

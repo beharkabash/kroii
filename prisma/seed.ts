@@ -66,11 +66,6 @@ async function main() {
         continue;
       }
 
-      // Parse drive type from specifications
-      const driveTypeSpec = car.specifications.find(
-        spec => spec.label === 'Vetotapa' || spec.label.toLowerCase().includes('drive')
-      );
-
       // Create car with all relations
       await prisma.car.create({
         data: {

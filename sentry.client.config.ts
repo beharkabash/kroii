@@ -38,7 +38,7 @@ Sentry.init({
     "ResizeObserver loop completed with undelivered notifications",
   ],
 
-  beforeSend(event, hint) {
+  beforeSend(event, _hint) {
     // Filter out localhost errors in development
     if (process.env.NODE_ENV === "development") {
       return null;

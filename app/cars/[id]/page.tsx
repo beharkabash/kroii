@@ -2,6 +2,7 @@ import { CarDetailContent } from './CarDetailContent';
 import { getCarById, getRelatedCars, convertToLegacyFormat } from '@/app/lib/db/cars';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { SEOGenerator } from '@/app/lib/seo-utils';
 
 // Force dynamic rendering to avoid database issues during build
 export const dynamic = 'force-dynamic';
@@ -46,52 +47,23 @@ export async function generateMetadata({
     };
   }
 
-  // Convert to legacy format for compatibility
-  const car = convertToLegacyFormat(dbCar);
-
-  const baseUrl = 'https://kroiautocenter.fi';
-  const imageUrl = car.image ? `${baseUrl}${car.image}` : `${baseUrl}/cars/placeholder.jpg`;
-
-  return {
-    title: `${car.name} - ${car.price} | Kroi Auto Center`,
-    description: `${car.description} ${car.year}, ${car.km}, ${car.fuel}, ${car.transmission}. Ota yhteyttä ja sovi koeajo!`,
-    keywords: [
-      car.brand,
-      car.model,
-      car.year,
-      car.fuel,
-      car.transmission,
-      'käytetty auto',
-      'auto myytävänä',
-      'Helsinki',
-      'Kroi Auto Center',
-    ].join(', '),
-    openGraph: {
-      title: `${car.name} - €${(car as { priceEur: number }).priceEur.toLocaleString()}`,
-      description: car.description,
-      url: `${baseUrl}/cars/${car.slug}`,
-      siteName: 'Kroi Auto Center',
-      images: [
-        {
-          url: imageUrl,
-          width: 1200,
-          height: 630,
-          alt: car.name,
-        },
-      ],
-      locale: 'fi_FI',
-      type: 'website',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: `${car.name} - ${car.price}`,
-      description: car.description,
-      images: [imageUrl],
-    },
-    alternates: {
-      canonical: `${baseUrl}/cars/${car.slug}`,
-    },
+  // Prepare car data for SEO generator
+  const carSEOData = {
+    id: dbCar.id,
+    make: dbCar.brand,
+    model: dbCar.model,
+    year: dbCar.year,
+    priceEur: dbCar.priceEur,
+    kmNumber: dbCar.kmNumber,
+    fuel: dbCar.fuel,
+    transmission: dbCar.transmission,
+    description: dbCar.description,
+    images: dbCar.images?.map(img => img.url) || [],
+    slug: dbCar.slug
   };
+
+  // Generate enhanced metadata using SEO utilities
+  return SEOGenerator.generateCarMetadata(carSEOData);
 }
 
 /**
@@ -114,55 +86,42 @@ export default async function CarDetailPage({ params }: { params: Promise<{ id: 
   const dbRelatedCars = await getRelatedCars(dbCar.id);
   const relatedCars = dbRelatedCars.map(convertToLegacyFormat);
 
-  // Generate structured data for SEO (Schema.org Product markup)
-  const structuredData = {
-    '@context': 'https://schema.org',
-    '@type': 'Car',
-    'name': dbCar.name,
-    'description': dbCar.description,
-    'brand': {
-      '@type': 'Brand',
-      'name': dbCar.brand,
-    },
-    'model': dbCar.model,
-    'vehicleModelDate': dbCar.year.toString(),
-    'mileageFromOdometer': {
-      '@type': 'QuantitativeValue',
-      'value': dbCar.kmNumber,
-      'unitCode': 'KMT',
-    },
-    'fuelType': dbCar.fuel,
-    'vehicleTransmission': dbCar.transmission,
-    'offers': {
-      '@type': 'Offer',
-      'price': dbCar.priceEur,
-      'priceCurrency': 'EUR',
-      'availability': 'https://schema.org/InStock',
-      'seller': {
-        '@type': 'AutoDealer',
-        'name': 'Kroi Auto Center Oy',
-        'telephone': '+358413188214',
-        'email': 'kroiautocenter@gmail.com',
-        'address': {
-          '@type': 'PostalAddress',
-          'streetAddress': 'Läkkisepäntie 15 B 300620',
-          'addressLocality': 'Helsinki',
-          'addressCountry': 'FI',
-        },
-      },
-    },
-    'itemCondition': 'https://schema.org/UsedCondition',
-    'url': `https://kroiautocenter.fi/cars/${dbCar.slug}`,
-    ...(dbCar.images && dbCar.images.length > 0 && {
-      'image': `https://kroiautocenter.fi${dbCar.images[0].url}`,
-    }),
+  // Prepare car data for enhanced SEO generators
+  const carSEOData = {
+    id: dbCar.id,
+    make: dbCar.brand,
+    model: dbCar.model,
+    year: dbCar.year,
+    priceEur: dbCar.priceEur,
+    kmNumber: dbCar.kmNumber,
+    fuel: dbCar.fuel,
+    transmission: dbCar.transmission,
+    description: dbCar.description,
+    images: dbCar.images?.map(img => img.url) || [],
+    slug: dbCar.slug
   };
+
+  // Generate enhanced structured data using SEO utilities
+  const carJSONLD = SEOGenerator.generateCarJSONLD(carSEOData);
+
+  // Generate breadcrumb structured data
+  const breadcrumbItems = [
+    { name: 'Etusivu', url: '/' },
+    { name: 'Autot', url: '/cars' },
+    { name: dbCar.brand, url: `/cars/brand/${dbCar.brand.toLowerCase()}` },
+    { name: `${dbCar.brand} ${dbCar.model} ${dbCar.year}`, url: `/cars/${dbCar.slug}` }
+  ];
+  const breadcrumbJSONLD = SEOGenerator.generateBreadcrumbJSONLD(breadcrumbItems);
 
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(carJSONLD) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJSONLD) }}
       />
       <CarDetailContent car={car} relatedCars={relatedCars} />
     </>

@@ -200,7 +200,7 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
 
       await fetchLead(); // Refresh data
       setNewNote('');
-    } catch (_) { // eslint-disable-line @typescript-eslint/no-unused-vars
+    } catch (_) {  
       alert('Virhe lisätessä muistiinpanoa');
     } finally {
       setAddingNote(false);
@@ -223,7 +223,7 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
       await fetchLead(); // Refresh data
       setNewActivity({ type: 'NOTE_ADDED', description: '' });
       setShowActivityModal(false);
-    } catch (_) { // eslint-disable-line @typescript-eslint/no-unused-vars
+    } catch (_) {  
       alert('Virhe lisätessä aktiviteettia');
     } finally {
       setAddingActivity(false);
@@ -247,7 +247,7 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
 
       await fetchLead(); // Refresh data
       setEditing(false);
-    } catch (_) { // eslint-disable-line @typescript-eslint/no-unused-vars
+    } catch (_) {  
       alert('Virhe päivittäessä liidiä');
     } finally {
       setSaving(false);

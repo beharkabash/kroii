@@ -1,12 +1,20 @@
 import type { NextConfig } from "next";
 import withBundleAnalyzer from "@next/bundle-analyzer";
+// @ts-expect-error - next-pwa doesn't have proper TypeScript types
+import withPWA from "next-pwa";
+import createNextIntlPlugin from 'next-intl/plugin';
+
+const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
 const bundleAnalyzer = withBundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
 });
 
+// Temporarily disable PWA for build testing
+const pwa = (config: NextConfig) => config;
+
 const nextConfig: NextConfig = {
-  // Allow deployment with ESLint warnings
+
   eslint: {
     ignoreDuringBuilds: false,
   },
@@ -14,15 +22,31 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: false,
   },
 
-  // Optimize images
+  // Optimize images with advanced settings
   images: {
     formats: ["image/avif", "image/webp"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    minimumCacheTTL: 60 * 60 * 24 * 365, // 1 year
+    minimumCacheTTL: 60 * 60 * 24 * 365, // 1 year cache
     dangerouslyAllowSVG: false,
     contentDispositionType: "attachment",
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'kroiautocenter.fi',
+        port: '',
+        pathname: '/cars/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.render.com',
+        port: '',
+        pathname: '/**',
+      }
+    ],
+    loader: 'default',
+    unoptimized: false,
   },
 
   // Compiler optimizations
@@ -144,4 +168,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default bundleAnalyzer(nextConfig);
+export default withNextIntl(bundleAnalyzer(pwa(nextConfig)));

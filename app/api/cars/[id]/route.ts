@@ -5,6 +5,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getCarById, trackCarView } from '@/app/lib/db/cars';
+import { cacheApiResponse } from '@/app/lib/cache';
+import { CACHE_KEYS, CACHE_DURATION } from '@/app/lib/redis';
 
 export async function GET(
   request: NextRequest,
@@ -20,7 +22,12 @@ export async function GET(
       );
     }
 
-    const car = await getCarById(id);
+    // Get car with caching
+    const car = await cacheApiResponse(
+      CACHE_KEYS.CAR_DETAILS(id),
+      async () => getCarById(id),
+      CACHE_DURATION.LONG
+    );
 
     if (!car) {
       return NextResponse.json(

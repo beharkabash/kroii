@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowLeft, Car as CarIcon, Search, SlidersHorizontal } from 'lucide-react';
 import { getAllCars, convertToLegacyFormat } from '../lib/db/cars';
 import Image from 'next/image';
+import InventoryAlerts from '../components/InventoryAlerts';
 
 export const metadata: Metadata = {
   title: 'Kaikki Autot | Kroi Auto Center',
@@ -178,9 +179,10 @@ export default async function AllCarsPage() {
             Kerro meille mitä etsit, niin autamme sinua löytämään täydellisen auton!
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <InventoryAlerts className="inline-flex items-center justify-center px-8 py-4 bg-white text-purple-600 rounded-lg font-semibold hover:bg-purple-50 transition" />
             <Link
               href="/#contact"
-              className="inline-flex items-center justify-center px-8 py-4 bg-white text-purple-600 rounded-lg font-semibold hover:bg-purple-50 transition"
+              className="inline-flex items-center justify-center px-8 py-4 bg-purple-700 text-white rounded-lg font-semibold hover:bg-purple-800 transition"
             >
               Ota yhteyttä
             </Link>

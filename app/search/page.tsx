@@ -66,7 +66,6 @@ export default function SearchPage() {
   });
 
   const [brands, setBrands] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState({ min: 0, max: 50000 });
 
   useEffect(() => {
     fetchSearchMetadata();
@@ -91,8 +90,6 @@ export default function SearchPage() {
 
       if (result.success) {
         setBrands(result.data.brands);
-        // Set price range based on available cars
-        setPriceRange({ min: 0, max: 50000 });
       }
     } catch (error) {
       console.error('Error fetching search metadata:', error);

@@ -1,0 +1,336 @@
+{
+  "common": {
+    "loading": "Ladataan...",
+    "search": "Haku",
+    "filter": "Suodatin",
+    "sort": "Järjestä",
+    "save": "Tallenna",
+    "cancel": "Peruuta",
+    "close": "Sulje",
+    "edit": "Muokkaa",
+    "delete": "Poista",
+    "view": "Katso",
+    "share": "Jaa",
+    "contact": "Ota yhteyttä",
+    "email": "Sähköposti",
+    "phone": "Puhelin",
+    "name": "Nimi",
+    "message": "Viesti",
+    "send": "Lähetä",
+    "clear": "Tyhjennä",
+    "back": "Takaisin",
+    "next": "Seuraava",
+    "previous": "Edellinen",
+    "yes": "Kyllä",
+    "no": "Ei",
+    "or": "tai",
+    "and": "ja",
+    "from": "alkaen",
+    "to": "asti",
+    "price": "Hinta",
+    "year": "Vuosi",
+    "make": "Merkki",
+    "model": "Malli",
+    "mileage": "Kilometrit",
+    "fuel": "Polttoaine",
+    "transmission": "Vaihteisto",
+    "color": "Väri",
+    "features": "Ominaisuudet",
+    "description": "Kuvaus",
+    "specifications": "Tekniset tiedot",
+    "images": "Kuvat",
+    "more": "Lisää",
+    "less": "Vähemmän",
+    "all": "Kaikki"
+  },
+  "navigation": {
+    "home": "Etusivu",
+    "inventory": "Autot",
+    "financing": "Rahoitus",
+    "about": "Tietoa meistä",
+    "contact": "Yhteystiedot",
+    "compare": "Vertaile",
+    "favorites": "Suosikit",
+    "language": "Kieli",
+    "customerPortal": "Asiakasalue",
+    "adminPanel": "Hallintapaneeli"
+  },
+  "homepage": {
+    "hero": {
+      "title": "Löydä unelmiesi auto",
+      "subtitle": "Laaja valikoima laatuautoja Helsingissä",
+      "searchPlaceholder": "Hae merkki, malli tai vuosi...",
+      "browseAll": "Selaa kaikkia autoja"
+    },
+    "features": {
+      "quality": {
+        "title": "Laatuautoja",
+        "description": "Huolellisesti valitut autot perusteellisella tarkastuksella"
+      },
+      "financing": {
+        "title": "Joustava rahoitus",
+        "description": "Räätälöidyt rahoitusratkaisut sopimaan juuri sinulle"
+      },
+      "service": {
+        "title": "Asiantunteva palvelu",
+        "description": "Kokenut tiimimme auttaa löytämään täydellisen auton"
+      },
+      "warranty": {
+        "title": "Takuu ja varmuus",
+        "description": "Kattava takuu ja jälkipalvelu ostamallesi autolle"
+      }
+    },
+    "cta": {
+      "title": "Valmis löytämään seuraavan autosi?",
+      "subtitle": "Ota yhteyttä tai tule käymään liikkeessämme Helsingissä",
+      "contact": "Ota yhteyttä",
+      "visit": "Käy liikkeessä"
+    }
+  },
+  "inventory": {
+    "title": "Myynnissä olevat autot",
+    "subtitle": "Selaa laajaa valikoimaamme laatuautoja",
+    "filters": {
+      "priceRange": "Hintaluokka",
+      "yearRange": "Vuosiväli",
+      "mileageRange": "Kilometrit",
+      "bodyType": "Korimalli",
+      "fuelType": "Polttoaine",
+      "transmission": "Vaihteisto",
+      "features": "Ominaisuudet"
+    },
+    "sorting": {
+      "newest": "Uusimmat ensin",
+      "oldest": "Vanhimmat ensin",
+      "priceLowHigh": "Hinta: alhaisin ensin",
+      "priceHighLow": "Hinta: korkein ensin",
+      "mileageLowHigh": "Kilometrit: vähiten ensin",
+      "mileageHighLow": "Kilometrit: eniten ensin"
+    },
+    "noResults": "Ei tuloksia",
+    "noResultsDescription": "Yritä muuttaa hakukriteereitä löytääksesi sopivia autoja",
+    "clearFilters": "Tyhjennä suodattimet",
+    "resultsCount": "{count} autoa löytyi",
+    "viewDetails": "Katso tarkemmin",
+    "addToFavorites": "Lisää suosikkeihin",
+    "removeFromFavorites": "Poista suosikeista",
+    "compare": "Vertaile",
+    "contactAbout": "Kysy tästä autosta"
+  },
+  "carDetails": {
+    "backToInventory": "Takaisin autovalikoimaan",
+    "inquire": "Kysy autosta",
+    "scheduleTestDrive": "Varaa koeajo",
+    "calculateFinancing": "Laske rahoitus",
+    "shareThis": "Jaa tämä auto",
+    "printDetails": "Tulosta tiedot",
+    "overview": "Yleiskatsaus",
+    "features": "Ominaisuudet",
+    "specifications": "Tekniset tiedot",
+    "financing": "Rahoituslaskuri",
+    "contact": "Ota yhteyttä",
+    "similar": "Samankaltaiset autot",
+    "gallery": "Kuvagalleria",
+    "description": "Kuvaus",
+    "condition": "Kunto",
+    "history": "Historia",
+    "documents": "Asiakirjat",
+    "warranty": "Takuu",
+    "delivery": "Toimitus",
+    "tradeIn": "Vaihtoauto",
+    "insurance": "Vakuutus"
+  },
+  "financing": {
+    "title": "Rahoituslaskuri",
+    "subtitle": "Laske kuukausierät ja löydä sopivin rahoitusvaihtoehto",
+    "carPrice": "Auton hinta",
+    "downPayment": "Käsiraha",
+    "loanTerm": "Laina-aika",
+    "interestRate": "Korko",
+    "monthlyPayment": "Kuukausierä",
+    "totalAmount": "Kokonaissumma",
+    "totalInterest": "Korot yhteensä",
+    "calculate": "Laske",
+    "apply": "Hae rahoitusta",
+    "terms": {
+      "12months": "12 kuukautta",
+      "24months": "24 kuukautta",
+      "36months": "36 kuukautta",
+      "48months": "48 kuukautta",
+      "60months": "60 kuukautta",
+      "72months": "72 kuukautta"
+    },
+    "example": "Esimerkkilaskelma",
+    "disclaimer": "Lopullinen korko määräytyy luottokelpoisuuden perusteella"
+  },
+  "contact": {
+    "title": "Ota yhteyttä",
+    "subtitle": "Autamme mielellämme kaikissa auton ostoon liittyvissä kysymyksissä",
+    "form": {
+      "name": "Nimi",
+      "email": "Sähköpostiosoite",
+      "phone": "Puhelinnumero",
+      "subject": "Aihe",
+      "message": "Viesti",
+      "send": "Lähetä viesti",
+      "sending": "Lähetetään...",
+      "success": "Viesti lähetetty onnistuneesti!",
+      "error": "Viestin lähetys epäonnistui. Yritä uudelleen."
+    },
+    "info": {
+      "address": "Osoite",
+      "phone": "Puhelin",
+      "email": "Sähköposti",
+      "hours": "Aukioloajat",
+      "monday": "Maanantai",
+      "tuesday": "Tiistai",
+      "wednesday": "Keskiviikko",
+      "thursday": "Torstai",
+      "friday": "Perjantai",
+      "saturday": "Lauantai",
+      "sunday": "Sunnuntai",
+      "closed": "Suljettu"
+    },
+    "whatsapp": "WhatsApp-chat",
+    "call": "Soita meille",
+    "email": "Lähetä sähköpostia",
+    "visit": "Käy liikkeessä"
+  },
+  "customer": {
+    "portal": {
+      "title": "Asiakasalue",
+      "dashboard": "Kojelauta",
+      "welcome": "Tervetuloa takaisin, {name}!",
+      "summary": "Tässä on yhteenveto toiminnastasi",
+      "stats": {
+        "favorites": "Suosikit",
+        "searches": "Tallennetut haut",
+        "inquiries": "Yhteydenotot",
+        "alerts": "Aktiiviset hälytykset"
+      },
+      "quickActions": {
+        "browse": "Selaa autoja",
+        "search": "Tallenna haku",
+        "compare": "Vertaile autoja",
+        "financing": "Rahoituslaskin"
+      },
+      "recentFavorites": "Viimeisimmät suosikit",
+      "recentInquiries": "Viimeisimmät yhteydenotot",
+      "recommendations": "Suositukset sinulle",
+      "alerts": "Aktiiviset hälytykset"
+    },
+    "auth": {
+      "login": {
+        "title": "Asiakasalue",
+        "subtitle": "Kirjaudu sisään hallitaksesi tietojasi ja seurataksesi suosikkiautoja",
+        "email": "Sähköpostiosoite",
+        "password": "Salasana",
+        "rememberMe": "Muista minut",
+        "forgotPassword": "Unohditko salasanan?",
+        "signIn": "Kirjaudu sisään",
+        "signUp": "Rekisteröidy tähän",
+        "noAccount": "Eikö sinulla ole vielä tiliä?",
+        "signingIn": "Kirjaudutaan...",
+        "error": "Virheelliset tunnukset. Tarkista sähköposti ja salasana."
+      },
+      "register": {
+        "title": "Luo asiakastili",
+        "subtitle": "Seuraa suosikkiautoja, tallenna hakuja ja saa ilmoituksia uusista autoista",
+        "firstName": "Etunimi",
+        "lastName": "Sukunimi",
+        "email": "Sähköpostiosoite",
+        "phone": "Puhelinnumero (valinnainen)",
+        "password": "Salasana (vähintään 8 merkkiä)",
+        "confirmPassword": "Vahvista salasana",
+        "agreeTerms": "Hyväksyn käyttöehdot ja tietosuojakäytännön",
+        "subscribe": "Haluan vastaanottaa ilmoituksia uusista autoista ja tarjouksista",
+        "createAccount": "Luo tili",
+        "hasAccount": "Onko sinulla jo tili?",
+        "success": "Rekisteröinti onnistui!",
+        "successMessage": "Tilisi on luotu onnistuneesti. Sinut ohjataan kirjautumissivulle..."
+      }
+    },
+    "profile": {
+      "title": "Oma profiili",
+      "subtitle": "Hallitse tilin asetuksia ja mieltymyksiä",
+      "basicInfo": "Perustiedot",
+      "preferences": "Asetukset",
+      "security": "Turvallisuus",
+      "firstName": "Etunimi",
+      "lastName": "Sukunimi",
+      "email": "Sähköposti",
+      "phone": "Puhelinnumero",
+      "notifications": "Ilmoitusasetukset",
+      "changePassword": "Vaihda salasana",
+      "currentPassword": "Nykyinen salasana",
+      "newPassword": "Uusi salasana",
+      "confirmNewPassword": "Vahvista uusi salasana"
+    },
+    "favorites": {
+      "title": "Suosikkiautot",
+      "empty": "Ei vielä suosikkiautoja",
+      "emptyDescription": "Aloita autojen selaaminen ja lisää kiinnostavat autot suosikkeihisi helposti käsin.",
+      "addedOn": "Lisätty suosikkeihin",
+      "remove": "Poista suosikeista",
+      "viewCar": "Katso auto"
+    }
+  },
+  "comparison": {
+    "title": "Autojen vertailu",
+    "subtitle": "Vertaile autojen ominaisuuksia ja hintoja rinnakkain",
+    "addCar": "Lisää auto",
+    "removeCar": "Poista auto",
+    "selectCar": "Valitse auto",
+    "noCarsSelected": "Ei autoja valittuna",
+    "selectCarsDescription": "Valitse vähintään kaksi autoa vertaillaksesi niitä",
+    "basicInfo": "Perustiedot",
+    "performance": "Suorituskyky",
+    "features": "Ominaisuudet",
+    "pricing": "Hinnoittelu",
+    "overall": "Kokonaisarvio",
+    "score": "Pisteet",
+    "pros": "Edut",
+    "cons": "Haitat"
+  },
+  "alerts": {
+    "title": "Autohälytykset",
+    "subtitle": "Saa ilmoituksia kun uusia autoja vastaa hakukriteereitäsi",
+    "create": "Luo uusi hälytys",
+    "manage": "Hallitse hälytyksiä",
+    "criteria": "Hakukriteerit",
+    "frequency": "Ilmoitustiheys",
+    "immediate": "Välittömästi",
+    "daily": "Päivittäin",
+    "weekly": "Viikoittain",
+    "active": "Aktiivinen",
+    "paused": "Pysäytetty",
+    "edit": "Muokkaa",
+    "delete": "Poista",
+    "pause": "Pysäytä",
+    "resume": "Jatka"
+  },
+  "errors": {
+    "pageNotFound": "Sivua ei löytynyt",
+    "serverError": "Palvelinvirhe",
+    "networkError": "Verkkovirhe",
+    "sessionExpired": "Istunto vanhentunut",
+    "unauthorized": "Ei käyttöoikeutta",
+    "validationError": "Tarkistusvirhe",
+    "tryAgain": "Yritä uudelleen",
+    "goHome": "Siirry etusivulle",
+    "contactSupport": "Ota yhteyttä tukeen"
+  },
+  "footer": {
+    "tagline": "Laatuautoja Helsingissä",
+    "quickLinks": "Pikalinkit",
+    "contact": "Yhteystiedot",
+    "social": "Sosiaalinen media",
+    "legal": "Juridiset",
+    "privacy": "Tietosuoja",
+    "terms": "Käyttöehdot",
+    "cookies": "Evästeet",
+    "copyright": "© {year} Kroi Auto Center. Kaikki oikeudet pidätetään.",
+    "address": "Helsinki, Suomi",
+    "hours": "Ma-Pe 9-18, La 10-16, Su 12-16"
+  }
+}

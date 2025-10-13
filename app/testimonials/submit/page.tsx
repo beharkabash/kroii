@@ -2,13 +2,21 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Star, Send, Car, MessageCircle, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Star, Send, MessageCircle, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 
 interface CarOption {
   id: string;
   name: string;
   make: string;
+  model: string;
+  year: number;
+  slug: string;
+}
+
+interface CarApiResponse {
+  id: string;
+  brand: string;
   model: string;
   year: number;
   slug: string;
@@ -39,7 +47,7 @@ export default function SubmitTestimonialPage() {
       const response = await fetch('/api/cars?limit=100');
       const result = await response.json();
       if (result.success) {
-        setCars(result.data.cars.map((car: any) => ({
+        setCars(result.data.cars.map((car: CarApiResponse) => ({
           id: car.id,
           name: `${car.brand} ${car.model} (${car.year})`,
           make: car.brand,
@@ -83,7 +91,7 @@ export default function SubmitTestimonialPage() {
       } else {
         setError(result.error || 'Arvostelun lähettäminen epäonnistui');
       }
-    } catch (error) {
+    } catch (_error) {
       setError('Verkkovirhe. Yritä uudelleen.');
     } finally {
       setIsSubmitting(false);

@@ -1,0 +1,336 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "edit": "Edit",
+    "delete": "Delete",
+    "view": "View",
+    "share": "Share",
+    "contact": "Contact",
+    "email": "Email",
+    "phone": "Phone",
+    "name": "Name",
+    "message": "Message",
+    "send": "Send",
+    "clear": "Clear",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "yes": "Yes",
+    "no": "No",
+    "or": "or",
+    "and": "and",
+    "from": "from",
+    "to": "to",
+    "price": "Price",
+    "year": "Year",
+    "make": "Make",
+    "model": "Model",
+    "mileage": "Mileage",
+    "fuel": "Fuel",
+    "transmission": "Transmission",
+    "color": "Color",
+    "features": "Features",
+    "description": "Description",
+    "specifications": "Specifications",
+    "images": "Images",
+    "more": "More",
+    "less": "Less",
+    "all": "All"
+  },
+  "navigation": {
+    "home": "Home",
+    "inventory": "Cars",
+    "financing": "Financing",
+    "about": "About",
+    "contact": "Contact",
+    "compare": "Compare",
+    "favorites": "Favorites",
+    "language": "Language",
+    "customerPortal": "Customer Portal",
+    "adminPanel": "Admin Panel"
+  },
+  "homepage": {
+    "hero": {
+      "title": "Find Your Dream Car",
+      "subtitle": "Wide selection of quality cars in Helsinki",
+      "searchPlaceholder": "Search make, model or year...",
+      "browseAll": "Browse all cars"
+    },
+    "features": {
+      "quality": {
+        "title": "Quality Cars",
+        "description": "Carefully selected cars with thorough inspection"
+      },
+      "financing": {
+        "title": "Flexible Financing",
+        "description": "Tailored financing solutions to suit you perfectly"
+      },
+      "service": {
+        "title": "Expert Service",
+        "description": "Our experienced team helps you find the perfect car"
+      },
+      "warranty": {
+        "title": "Warranty & Assurance",
+        "description": "Comprehensive warranty and after-sales service for your car"
+      }
+    },
+    "cta": {
+      "title": "Ready to find your next car?",
+      "subtitle": "Contact us or visit our showroom in Helsinki",
+      "contact": "Contact us",
+      "visit": "Visit showroom"
+    }
+  },
+  "inventory": {
+    "title": "Cars for Sale",
+    "subtitle": "Browse our wide selection of quality cars",
+    "filters": {
+      "priceRange": "Price Range",
+      "yearRange": "Year Range",
+      "mileageRange": "Mileage",
+      "bodyType": "Body Type",
+      "fuelType": "Fuel Type",
+      "transmission": "Transmission",
+      "features": "Features"
+    },
+    "sorting": {
+      "newest": "Newest first",
+      "oldest": "Oldest first",
+      "priceLowHigh": "Price: Low to High",
+      "priceHighLow": "Price: High to Low",
+      "mileageLowHigh": "Mileage: Low to High",
+      "mileageHighLow": "Mileage: High to Low"
+    },
+    "noResults": "No results found",
+    "noResultsDescription": "Try adjusting your search criteria to find suitable cars",
+    "clearFilters": "Clear filters",
+    "resultsCount": "{count} cars found",
+    "viewDetails": "View details",
+    "addToFavorites": "Add to favorites",
+    "removeFromFavorites": "Remove from favorites",
+    "compare": "Compare",
+    "contactAbout": "Ask about this car"
+  },
+  "carDetails": {
+    "backToInventory": "Back to inventory",
+    "inquire": "Inquire about car",
+    "scheduleTestDrive": "Schedule test drive",
+    "calculateFinancing": "Calculate financing",
+    "shareThis": "Share this car",
+    "printDetails": "Print details",
+    "overview": "Overview",
+    "features": "Features",
+    "specifications": "Specifications",
+    "financing": "Financing Calculator",
+    "contact": "Contact",
+    "similar": "Similar cars",
+    "gallery": "Photo gallery",
+    "description": "Description",
+    "condition": "Condition",
+    "history": "History",
+    "documents": "Documents",
+    "warranty": "Warranty",
+    "delivery": "Delivery",
+    "tradeIn": "Trade-in",
+    "insurance": "Insurance"
+  },
+  "financing": {
+    "title": "Financing Calculator",
+    "subtitle": "Calculate monthly payments and find the best financing option",
+    "carPrice": "Car price",
+    "downPayment": "Down payment",
+    "loanTerm": "Loan term",
+    "interestRate": "Interest rate",
+    "monthlyPayment": "Monthly payment",
+    "totalAmount": "Total amount",
+    "totalInterest": "Total interest",
+    "calculate": "Calculate",
+    "apply": "Apply for financing",
+    "terms": {
+      "12months": "12 months",
+      "24months": "24 months",
+      "36months": "36 months",
+      "48months": "48 months",
+      "60months": "60 months",
+      "72months": "72 months"
+    },
+    "example": "Example calculation",
+    "disclaimer": "Final interest rate determined based on creditworthiness"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "We're happy to help with all your car buying questions",
+    "form": {
+      "name": "Name",
+      "email": "Email address",
+      "phone": "Phone number",
+      "subject": "Subject",
+      "message": "Message",
+      "send": "Send message",
+      "sending": "Sending...",
+      "success": "Message sent successfully!",
+      "error": "Failed to send message. Please try again."
+    },
+    "info": {
+      "address": "Address",
+      "phone": "Phone",
+      "email": "Email",
+      "hours": "Opening hours",
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday",
+      "closed": "Closed"
+    },
+    "whatsapp": "WhatsApp chat",
+    "call": "Call us",
+    "email": "Send email",
+    "visit": "Visit showroom"
+  },
+  "customer": {
+    "portal": {
+      "title": "Customer Portal",
+      "dashboard": "Dashboard",
+      "welcome": "Welcome back, {name}!",
+      "summary": "Here's a summary of your activity",
+      "stats": {
+        "favorites": "Favorites",
+        "searches": "Saved searches",
+        "inquiries": "Inquiries",
+        "alerts": "Active alerts"
+      },
+      "quickActions": {
+        "browse": "Browse cars",
+        "search": "Save search",
+        "compare": "Compare cars",
+        "financing": "Financing calculator"
+      },
+      "recentFavorites": "Recent favorites",
+      "recentInquiries": "Recent inquiries",
+      "recommendations": "Recommendations for you",
+      "alerts": "Active alerts"
+    },
+    "auth": {
+      "login": {
+        "title": "Customer Portal",
+        "subtitle": "Sign in to manage your information and track favorite cars",
+        "email": "Email address",
+        "password": "Password",
+        "rememberMe": "Remember me",
+        "forgotPassword": "Forgot password?",
+        "signIn": "Sign in",
+        "signUp": "Sign up here",
+        "noAccount": "Don't have an account yet?",
+        "signingIn": "Signing in...",
+        "error": "Invalid credentials. Please check your email and password."
+      },
+      "register": {
+        "title": "Create customer account",
+        "subtitle": "Follow favorite cars, save searches and get notifications about new cars",
+        "firstName": "First name",
+        "lastName": "Last name",
+        "email": "Email address",
+        "phone": "Phone number (optional)",
+        "password": "Password (minimum 8 characters)",
+        "confirmPassword": "Confirm password",
+        "agreeTerms": "I agree to the terms of service and privacy policy",
+        "subscribe": "I want to receive notifications about new cars and offers",
+        "createAccount": "Create account",
+        "hasAccount": "Already have an account?",
+        "success": "Registration successful!",
+        "successMessage": "Your account has been created successfully. You will be redirected to the login page..."
+      }
+    },
+    "profile": {
+      "title": "My Profile",
+      "subtitle": "Manage account settings and preferences",
+      "basicInfo": "Basic information",
+      "preferences": "Preferences",
+      "security": "Security",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "phone": "Phone number",
+      "notifications": "Notification settings",
+      "changePassword": "Change password",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "confirmNewPassword": "Confirm new password"
+    },
+    "favorites": {
+      "title": "Favorite Cars",
+      "empty": "No favorite cars yet",
+      "emptyDescription": "Start browsing cars and easily add interesting cars to your favorites.",
+      "addedOn": "Added to favorites",
+      "remove": "Remove from favorites",
+      "viewCar": "View car"
+    }
+  },
+  "comparison": {
+    "title": "Car Comparison",
+    "subtitle": "Compare car features and prices side by side",
+    "addCar": "Add car",
+    "removeCar": "Remove car",
+    "selectCar": "Select car",
+    "noCarsSelected": "No cars selected",
+    "selectCarsDescription": "Select at least two cars to compare them",
+    "basicInfo": "Basic information",
+    "performance": "Performance",
+    "features": "Features",
+    "pricing": "Pricing",
+    "overall": "Overall rating",
+    "score": "Score",
+    "pros": "Pros",
+    "cons": "Cons"
+  },
+  "alerts": {
+    "title": "Car Alerts",
+    "subtitle": "Get notified when new cars match your search criteria",
+    "create": "Create new alert",
+    "manage": "Manage alerts",
+    "criteria": "Search criteria",
+    "frequency": "Notification frequency",
+    "immediate": "Immediately",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "active": "Active",
+    "paused": "Paused",
+    "edit": "Edit",
+    "delete": "Delete",
+    "pause": "Pause",
+    "resume": "Resume"
+  },
+  "errors": {
+    "pageNotFound": "Page not found",
+    "serverError": "Server error",
+    "networkError": "Network error",
+    "sessionExpired": "Session expired",
+    "unauthorized": "Unauthorized",
+    "validationError": "Validation error",
+    "tryAgain": "Try again",
+    "goHome": "Go to home",
+    "contactSupport": "Contact support"
+  },
+  "footer": {
+    "tagline": "Quality cars in Helsinki",
+    "quickLinks": "Quick links",
+    "contact": "Contact information",
+    "social": "Social media",
+    "legal": "Legal",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "cookies": "Cookies",
+    "copyright": "© {year} Kroi Auto Center. All rights reserved.",
+    "address": "Helsinki, Finland",
+    "hours": "Mon-Fri 9-18, Sat 10-16, Sun 12-16"
+  }
+}

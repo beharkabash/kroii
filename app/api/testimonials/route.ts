@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/app/lib/db/prisma';
 import { z } from 'zod';
+import { cacheApiResponse } from '@/app/lib/cache';
+import { CACHE_KEYS, CACHE_DURATION } from '@/app/lib/redis';
 
 const testimonialSchema = z.object({
   customerName: z.string().min(1, 'Customer name is required'),
@@ -26,25 +28,32 @@ export async function GET(request: NextRequest) {
       ...(vehicleId && { vehicleId }),
     };
 
-    const testimonials = await prisma.testimonials.findMany({
-      where,
-      include: {
-        vehicles: {
-          select: {
-            id: true,
-            make: true,
-            model: true,
-            year: true,
-            slug: true,
+    // Cache testimonials with parameters as cache key
+    const cacheKey = `${CACHE_KEYS.TESTIMONIALS}:${JSON.stringify({ vehicleId, limit, approved })}`;
+
+    const testimonials = await cacheApiResponse(
+      cacheKey,
+      async () => prisma.testimonials.findMany({
+        where,
+        include: {
+          vehicles: {
+            select: {
+              id: true,
+              make: true,
+              model: true,
+              year: true,
+              slug: true,
+            },
           },
         },
-      },
-      orderBy: [
-        { rating: 'desc' },
-        { createdAt: 'desc' },
-      ],
-      take: limit,
-    });
+        orderBy: [
+          { rating: 'desc' },
+          { createdAt: 'desc' },
+        ],
+        take: limit,
+      }),
+      CACHE_DURATION.LONG
+    );
 
     return NextResponse.json({
       success: true,

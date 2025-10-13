@@ -48,7 +48,7 @@ export default function TradeInValuationPage() {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 30 }, (_, i) => currentYear - i);
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: string, value: string | number | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -89,7 +89,7 @@ export default function TradeInValuationPage() {
       } else {
         setError(result.error || 'Arvioinnin pyytäminen epäonnistui');
       }
-    } catch (error) {
+    } catch (_error) {
       setError('Verkkovirhe. Yritä uudelleen.');
     } finally {
       setIsSubmitting(false);

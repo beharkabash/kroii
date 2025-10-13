@@ -6,6 +6,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { searchCars, getAllBrands, getCarCountByCategory } from '@/app/lib/db/cars';
 import { CarCategory, CarStatus } from '@prisma/client';
+import { cacheApiResponse } from '@/app/lib/cache';
+import { CACHE_KEYS, CACHE_DURATION } from '@/app/lib/redis';
 
 export async function GET(request: NextRequest) {
   try {
@@ -67,13 +69,15 @@ export async function GET(request: NextRequest) {
       filters.transmission = searchParams.get('transmission')!;
     }
 
-    // Perform search
-    const result = await searchCars(query, filters, {
-      page,
-      limit,
-      sortBy,
-      sortOrder
-    });
+    // Create cache key for search
+    const searchKey = `${CACHE_KEYS.CARS_SEARCH}:${JSON.stringify({ query, filters, page, limit, sortBy, sortOrder })}`;
+
+    // Perform search with caching
+    const result = await cacheApiResponse(
+      searchKey,
+      async () => searchCars(query, filters, { page, limit, sortBy, sortOrder }),
+      CACHE_DURATION.SHORT
+    );
 
     return NextResponse.json({
       success: true,
@@ -99,18 +103,27 @@ export async function GET(request: NextRequest) {
  */
 export async function POST() {
   try {
-    const brands = await getAllBrands();
-    const categoryCounts = await getCarCountByCategory();
+    // Cache search metadata for longer since it changes less frequently
+    const metadata = await cacheApiResponse(
+      'search:metadata',
+      async () => {
+        const brands = await getAllBrands();
+        const categoryCounts = await getCarCountByCategory();
+
+        return {
+          brands,
+          categories: Object.keys(categoryCounts),
+          categoryCounts,
+          fuelTypes: ['DIESEL', 'PETROL', 'ELECTRIC', 'HYBRID'],
+          transmissionTypes: ['AUTOMATIC', 'MANUAL']
+        };
+      },
+      CACHE_DURATION.LONG
+    );
 
     return NextResponse.json({
       success: true,
-      data: {
-        brands,
-        categories: Object.keys(categoryCounts),
-        categoryCounts,
-        fuelTypes: ['DIESEL', 'PETROL', 'ELECTRIC', 'HYBRID'],
-        transmissionTypes: ['AUTOMATIC', 'MANUAL']
-      }
+      data: metadata
     });
 
   } catch (error) {

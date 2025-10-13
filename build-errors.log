@@ -1,0 +1,127 @@
+
+> kroi-auto-center@0.1.0 build
+> npx prisma generate && next build
+
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v6.16.2) to ./node_modules/@prisma/client in 1.59s
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+
+ ⚠ You are using a non-standard "NODE_ENV" value in your environment. This creates inconsistencies in the project and is strongly advised against. Read more: https://nextjs.org/docs/messages/non-standard-node-env
+   ▲ Next.js 15.5.4
+   - Environments: .env.local, .env.production
+
+   Creating an optimized production build ...
+ ⚠ Compiled with warnings in 29.2s
+
+./node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@sentry/opentelemetry/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/server/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./app/lib/logger.ts
+./app/lib/middleware/monitoring.ts
+./app/api/health/route.ts
+
+   Linting and checking validity of types ...
+
+Failed to compile.
+
+./app/api/alerts/route.ts
+2:34  Warning: 'AlertCriteria' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./app/api/customer/dashboard/route.ts
+8:10  Warning: 'request' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./app/api/customer/favorites/route.ts
+8:10  Warning: 'request' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./app/api/customer/profile/route.ts
+22:10  Warning: 'request' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./app/api/customer/register/route.ts
+78:13  Warning: 'customer' is assigned a value but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./app/api/health/route.ts
+9:11  Warning: 'HealthCheck' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+30:10  Warning: 'request' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+43:18  Warning: 'error' is defined but never used. Allowed unused caught errors must match /^_/u.  @typescript-eslint/no-unused-vars
+56:18  Warning: 'error' is defined but never used. Allowed unused caught errors must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./app/components/AdvancedFinancingCalculator.tsx
+22:11  Warning: 'LoanComparison' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+398:55  Warning: 'index' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./app/components/PWAStatus.tsx
+8:10  Warning: 'isInstalled' is assigned a value but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./app/components/WhatsAppChat.tsx
+4:28  Warning: 'Send' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+38:10  Warning: 'currentTime' is assigned a value but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./app/customer/auth/login/page.tsx
+43:14  Warning: 'error' is defined but never used. Allowed unused caught errors must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./app/customer/auth/register/page.tsx
+77:14  Warning: 'error' is defined but never used. Allowed unused caught errors must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./app/customer/dashboard/page.tsx
+222:40  Warning: 'index' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+261:52  Warning: 'index' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+263:19  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+302:51  Warning: 'index' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+340:58  Warning: 'index' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+343:21  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+386:40  Warning: 'index' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./app/customer/favorites/page.tsx
+66:6  Warning: React Hook useEffect has a missing dependency: 'filterAndSortFavorites'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/customer/profile/page.tsx
+107:14  Warning: 'error' is defined but never used. Allowed unused caught errors must match /^_/u.  @typescript-eslint/no-unused-vars
+149:14  Warning: 'error' is defined but never used. Allowed unused caught errors must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./app/lib/cache-invalidation.ts
+100:59  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+100:69  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/lib/comparison-store.ts
+139:46  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/lib/db/config.ts
+78:43  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+178:18  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/lib/inventory-alerts.ts
+2:10  Warning: 'CarCategory' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+186:31  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+228:40  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+289:14  Warning: 'error' is defined but never used. Allowed unused caught errors must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./app/lib/middleware/monitoring.ts
+19:25  Warning: 'T' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+373:1  Warning: Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+./app/lib/og-image-generator.ts
+33:30  Warning: 'config' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./app/lib/pwa-utils.ts
+84:33  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/lib/redis.ts
+58:10  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/lib/utils.ts
+29:46  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+29:56  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules

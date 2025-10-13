@@ -1,0 +1,141 @@
+/**
+ * Combined Middleware
+ * Handles internationalization, authentication and security headers
+ */
+
+import { withAuth } from 'next-auth/middleware';
+import { NextRequest, NextResponse } from 'next/server';
+import createIntlMiddleware from 'next-intl/middleware';
+import { locales, defaultLocale } from './i18n';
+
+// Create the internationalization middleware
+const intlMiddleware = createIntlMiddleware({
+  locales,
+  defaultLocale,
+  localePrefix: 'never' // Don't use locale prefixes in URLs
+});
+
+export default withAuth(
+  function middleware(req: NextRequest) {
+    const { pathname } = req.nextUrl;
+    const token = req.nextauth.token;
+
+    // Skip i18n middleware for admin routes, API routes, and static files
+    const shouldSkipIntl =
+      pathname.startsWith('/admin') ||
+      pathname.startsWith('/api') ||
+      pathname.startsWith('/_next') ||
+      pathname.includes('.') ||
+      pathname === '/manifest.json' ||
+      pathname === '/sw.js';
+
+    // Temporarily disable i18n middleware to fix routing
+    // TODO: Re-enable after fixing configuration
+    /*
+    // Handle internationalization for public routes
+    if (!shouldSkipIntl) {
+      const intlResponse = intlMiddleware(req);
+      if (intlResponse) {
+        // Apply security headers to intl response
+        intlResponse.headers.set('X-DNS-Prefetch-Control', 'on');
+        intlResponse.headers.set('X-Frame-Options', 'SAMEORIGIN');
+        intlResponse.headers.set('X-Content-Type-Options', 'nosniff');
+        intlResponse.headers.set('Referrer-Policy', 'origin-when-cross-origin');
+        intlResponse.headers.set(
+          'Permissions-Policy',
+          'camera=(), microphone=(), geolocation=()'
+        );
+        intlResponse.headers.set('X-XSS-Protection', '1; mode=block');
+        return intlResponse;
+      }
+    }
+    */
+
+    // Create response for non-intl routes
+    const response = NextResponse.next();
+
+    // Set security headers for all requests
+    response.headers.set('X-DNS-Prefetch-Control', 'on');
+    response.headers.set('X-Frame-Options', 'SAMEORIGIN');
+    response.headers.set('X-Content-Type-Options', 'nosniff');
+    response.headers.set('Referrer-Policy', 'origin-when-cross-origin');
+    response.headers.set(
+      'Permissions-Policy',
+      'camera=(), microphone=(), geolocation=()'
+    );
+    response.headers.set('X-XSS-Protection', '1; mode=block');
+
+    // Handle authentication for admin routes
+    if (pathname.startsWith('/admin')) {
+      // Allow access to login page
+      if (pathname.startsWith('/admin/login')) {
+        return response;
+      }
+
+      // Redirect unauthenticated users to login
+      if (!token) {
+        return NextResponse.redirect(new URL('/admin/login', req.url));
+      }
+
+      // Check role-based permissions
+      const userRole = token.role as string;
+
+      // Super admin has access to everything
+      if (userRole === 'SUPER_ADMIN') {
+        return response;
+      }
+
+      // Admin has access to most admin features
+      if (userRole === 'ADMIN' && !pathname.startsWith('/admin/users')) {
+        return response;
+      }
+
+      // Viewer has read-only access
+      if (userRole === 'VIEWER' && (
+        pathname.startsWith('/admin/cars') ||
+        pathname.startsWith('/admin/leads') ||
+        pathname.startsWith('/admin/analytics')
+      )) {
+        return response;
+      }
+
+      // Insufficient permissions
+      return NextResponse.redirect(new URL('/admin/unauthorized', req.url));
+    }
+
+    return response;
+  },
+  {
+    callbacks: {
+      authorized: ({ token, req }) => {
+        const { pathname } = req.nextUrl;
+
+        // Allow public routes and i18n routes
+        if (!pathname.startsWith('/admin')) {
+          return true;
+        }
+
+        // Allow login page
+        if (pathname === '/admin/login') {
+          return true;
+        }
+
+        // Require authentication for admin routes
+        return !!token;
+      },
+    },
+  }
+);
+
+export const config = {
+  matcher: [
+    // Enable a redirect to a matching locale at the root
+    '/',
+
+    // Enable middleware for all routes except API, admin, and static files
+    '/((?!_next|_vercel|api|admin|manifest.json|sw.js|.*\\..*).*)',
+
+    // Admin routes
+    '/admin/:path*',
+  ],
+};

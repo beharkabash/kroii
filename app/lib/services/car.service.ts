@@ -47,12 +47,12 @@ const CacheTTL = {
 
 // Mock redis interface - TODO: replace with actual redis
 const redis = {
-  async get<T>(_key: string): Promise<T | null> { return null; },
-  async set(_key: string, _value: unknown, _ttl?: number): Promise<void> { },
-  async del(_key: string): Promise<void> { },
-  async delPattern(_pattern: string): Promise<void> { },
-  async incr(_key: string): Promise<number> { return 1; },
-  async expire(_key: string, _ttl: number): Promise<void> { },
+  async get<T>(__key: string): Promise<T | null> { return null; },
+  async set(__key: string, __value: unknown, __ttl?: number): Promise<void> { },
+  async del(__key: string): Promise<void> { },
+  async delPattern(__pattern: string): Promise<void> { },
+  async incr(__key: string): Promise<number> { return 1; },
+  async expire(__key: string, __ttl: number): Promise<void> { },
 };
 
 // Simplified interface to match actual Prisma return types

@@ -1,9 +1,12 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/app/lib/db/prisma';
+import { RedisService } from '@/app/lib/redis';
+import { APIMonitoring, HealthMonitoring } from '@/app/lib/middleware/monitoring';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-interface HealthCheck {
+interface _HealthCheck {
   status: 'healthy' | 'degraded' | 'unhealthy';
   timestamp: string;
   uptime: number;
@@ -11,6 +14,8 @@ interface HealthCheck {
   environment: string;
   checks: {
     server: boolean;
+    database: 'healthy' | 'unhealthy' | 'disabled';
+    redis: 'healthy' | 'unhealthy' | 'disabled';
     memory: {
       status: boolean;
       used: number;
@@ -18,63 +23,95 @@ interface HealthCheck {
       percentage: number;
     };
   };
+  errors?: string[];
 }
 
-export async function GET() {
-  const startTime = Date.now();
+export const GET = APIMonitoring.withMonitoring(
+  async (_request: NextRequest) => {
+    const startTime = Date.now();
 
-  try {
-    // Memory check
-    const memoryUsage = process.memoryUsage();
-    const totalMemory = memoryUsage.heapTotal;
-    const usedMemory = memoryUsage.heapUsed;
-    const memoryPercentage = (usedMemory / totalMemory) * 100;
+    try {
+      // Use the new comprehensive health monitoring
+      const healthResult = await HealthMonitoring.performHealthCheck();
 
-    // Determine health status
-    let status: 'healthy' | 'degraded' | 'unhealthy' = 'healthy';
+      // Check database connection
+      let databaseStatus: 'healthy' | 'unhealthy' | 'disabled' = 'disabled';
+      if (process.env.DATABASE_URL) {
+        try {
+          await prisma.$queryRaw`SELECT 1`;
+          databaseStatus = 'healthy';
+        } catch (_error) {
+          databaseStatus = 'unhealthy';
+          healthResult.checks.database = false;
+        }
+      }
 
-    if (memoryPercentage > 90) {
-      status = 'unhealthy';
-    } else if (memoryPercentage > 75) {
-      status = 'degraded';
-    }
+      // Check Redis connection
+      let redisStatus: 'healthy' | 'unhealthy' | 'disabled' = 'disabled';
+      if (process.env.REDIS_URL) {
+        try {
+          const redis = RedisService.getInstance();
+          await redis.exists('health_check_test');
+          redisStatus = 'healthy';
+        } catch (_error) {
+          redisStatus = 'unhealthy';
+          healthResult.checks.redis = false;
+        }
+      }
 
-    const healthCheck: HealthCheck = {
-      status,
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-      version: process.env.npm_package_version || '1.0.0',
-      environment: process.env.NODE_ENV || 'development',
-      checks: {
-        server: true,
-        memory: {
-          status: memoryPercentage < 90,
-          used: Math.round(usedMemory / 1024 / 1024), // MB
-          total: Math.round(totalMemory / 1024 / 1024), // MB
-          percentage: Math.round(memoryPercentage),
+      // Get API performance metrics
+      const apiMetrics = APIMonitoring.getAggregatedMetrics(300000); // 5 minutes
+
+      const healthCheck = {
+        status: healthResult.status,
+        timestamp: healthResult.timestamp,
+        uptime: process.uptime(),
+        version: process.env.npm_package_version || '1.0.0',
+        environment: process.env.NODE_ENV || 'development',
+        checks: {
+          server: true,
+          database: databaseStatus,
+          redis: redisStatus,
+          memory: healthResult.checks.memory,
+          api: healthResult.checks.apiPerformance,
         },
-      },
-    };
+        metrics: {
+          memory: {
+            used: healthResult.metrics.memoryUsedMB,
+            percentage: healthResult.metrics.memoryUsagePercent,
+          },
+          api: apiMetrics ? {
+            avgResponseTime: apiMetrics.avgDuration,
+            errorRate: apiMetrics.errorRate,
+            requestCount: apiMetrics.totalRequests,
+          } : null,
+          uptime: healthResult.metrics.uptimeSeconds,
+        },
+      };
 
-    const responseTime = Date.now() - startTime;
+      const responseTime = Date.now() - startTime;
 
-    return NextResponse.json(healthCheck, {
-      status: status === 'healthy' ? 200 : status === 'degraded' ? 200 : 503,
-      headers: {
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'X-Response-Time': `${responseTime}ms`,
-      },
-    });
-  } catch (error) {
-    console.error('Health check failed:', error);
+      return NextResponse.json(healthCheck, {
+        status: healthResult.status === 'healthy' ? 200 :
+               healthResult.status === 'degraded' ? 200 : 503,
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'X-Response-Time': `${responseTime}ms`,
+        },
+      });
+    } catch (error) {
+      console.error('Health check failed:', error);
 
-    return NextResponse.json(
-      {
-        status: 'unhealthy',
-        timestamp: new Date().toISOString(),
-        error: 'Health check failed',
-      },
-      { status: 503 }
-    );
-  }
-}
+      return NextResponse.json(
+        {
+          status: 'unhealthy',
+          timestamp: new Date().toISOString(),
+          error: 'Health check failed',
+          details: error instanceof Error ? error.message : 'Unknown error',
+        },
+        { status: 503 }
+      );
+    }
+  },
+  '/api/health'
+);

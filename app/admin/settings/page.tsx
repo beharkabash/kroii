@@ -167,7 +167,7 @@ export default function SettingsPage() {
 
       setSuccessMessage('Asetukset tallennettu onnistuneesti');
       setTimeout(() => setSuccessMessage(null), 3000);
-    } catch (_) { // eslint-disable-line @typescript-eslint/no-unused-vars
+    } catch (_) {  
       setError('Virhe tallentaessa asetuksia');
       setTimeout(() => setError(null), 5000);
     } finally {

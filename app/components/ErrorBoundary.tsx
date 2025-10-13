@@ -3,6 +3,7 @@
 import { Component, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import Link from 'next/link';
+import * as Sentry from '@sentry/nextjs';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -45,16 +46,18 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       console.error('[ErrorBoundary] Error info:', errorInfo);
     }
 
-    // Log error to monitoring service (e.g., Sentry) in production
-    if (process.env.NODE_ENV === 'production') {
-      // TODO: Send to error tracking service
-      console.error('[ErrorBoundary] Production error:', {
-        error: error.message,
-        stack: error.stack,
+    // Send to Sentry error tracking
+    Sentry.withScope((scope) => {
+      scope.setTag('errorBoundary', true);
+      scope.setLevel('error');
+      scope.setContext('errorBoundary', {
         componentStack: errorInfo.componentStack,
-        timestamp: new Date().toISOString(),
+        errorBoundary: 'ErrorBoundary',
       });
-    }
+      scope.setExtra('componentStack', errorInfo.componentStack);
+
+      Sentry.captureException(error);
+    });
 
     this.setState({
       errorInfo: errorInfo.componentStack || null,

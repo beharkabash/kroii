@@ -5,14 +5,15 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/lib/auth';
-import { PrismaClient, CarStatus, CarCategory } from '@prisma/client';
+import { authOptions } from '@/app/lib/core/auth';
+import { PrismaClient } from '@prisma/client';
+import { CarStatus } from '@/types/prisma';
 
 const prisma = new PrismaClient();
 
 // Helper function to generate slug from car name
-function generateSlug(brand: string, model: string, year: number): string {
-  const name = `${brand} ${model} ${year}`;
+function generateSlug(make: string, model: string, year: number): string {
+  const name = `${make} ${model} ${year}`;
   return name
     .toLowerCase()
     .replace(/[åä]/g, 'a')
@@ -29,7 +30,7 @@ async function getUniqueSlug(baseSlug: string, excludeId?: string): Promise<stri
   let counter = 1;
 
   while (true) {
-    const existing = await prisma.car.findUnique({ where: { slug } });
+    const existing = await prisma.vehicles.findUnique({ where: { slug } });
     if (!existing || existing.id === excludeId) {
       break;
     }
@@ -56,23 +57,24 @@ export async function GET(
       );
     }
 
-    const car = await prisma.car.findUnique({
-      where: { id },
-      include: {
-        images: {
-          orderBy: { order: 'asc' }
-        },
-        features: {
-          orderBy: { order: 'asc' }
-        },
-        specifications: {
-          orderBy: { order: 'asc' }
-        },
-        views: {
-          orderBy: { createdAt: 'desc' },
-          take: 10
-        }
-      }
+    const car = await prisma.vehicles.findUnique({
+      where: { id }
+      // Note: images, features, specifications, and views tables don't exist in schema
+      // include: {
+      //   images: {
+      //     orderBy: { order: 'asc' }
+      //   },
+      //   features: {
+      //     orderBy: { order: 'asc' }
+      //   },
+      //   specifications: {
+      //     orderBy: { order: 'asc' }
+      //   },
+      //   views: {
+      //     orderBy: { createdAt: 'desc' },
+      //     take: 10
+      //   }
+      // }
     });
 
     if (!car) {
@@ -127,13 +129,14 @@ export async function PUT(
     const data = await request.json();
 
     // Check if car exists
-    const existingCar = await prisma.car.findUnique({
-      where: { id },
-      include: {
-        images: true,
-        features: true,
-        specifications: true,
-      }
+    const existingCar = await prisma.vehicles.findUnique({
+      where: { id }
+      // Note: images, features, specifications tables don't exist in schema
+      // include: {
+      //   images: true,
+      //   features: true,
+      //   specifications: true,
+      // }
     });
 
     if (!existingCar) {
@@ -145,84 +148,74 @@ export async function PUT(
 
     // Generate new slug if brand, model, or year changed
     let slug = existingCar.slug;
-    if (data.brand !== existingCar.brand ||
+    if (data.make !== existingCar.make ||
         data.model !== existingCar.model ||
         parseInt(data.year) !== existingCar.year) {
-      const baseSlug = generateSlug(data.brand, data.model, parseInt(data.year));
+      const baseSlug = generateSlug(data.make, data.model, parseInt(data.year));
       slug = await getUniqueSlug(baseSlug, id);
     }
 
-    // Prepare car data
+    // Prepare car data (matching vehicles schema)
     const carData = {
       slug,
-      name: data.name || `${data.brand} ${data.model}`,
-      brand: data.brand,
+      make: data.make,
       model: data.model,
       year: parseInt(data.year),
-      priceEur: parseInt(data.priceEur),
-      fuel: data.fuel,
+      price: parseInt(data.price),
+      mileage: parseInt(data.mileage) || 0,
+      fuelType: data.fuelType,
       transmission: data.transmission,
-      kmNumber: parseInt(data.kmNumber) || 0,
-      color: data.color || null,
-      driveType: data.driveType || null,
-      engineSize: data.engineSize || null,
-      power: data.power ? parseInt(data.power) : null,
-      status: data.status as CarStatus,
-      condition: data.condition || null,
-      category: data.category as CarCategory,
+      bodyType: data.bodyType,
+      color: data.color || '',
+      engineSize: data.engineSize || '',
+      drivetrain: data.drivetrain || '',
+      features: data.features || '',
+      images: data.images || '',
+      description: data.description || '',
       featured: Boolean(data.featured),
-      description: data.description,
-      detailedDescription: data.detailedDescription || [],
-      metaTitle: data.metaTitle || null,
-      metaDescription: data.metaDescription || null,
+      status: data.status as CarStatus,
+      vin: data.vin || null,
+      doors: data.doors ? parseInt(data.doors) : null,
+      seats: data.seats ? parseInt(data.seats) : null,
     };
 
-    // Update car in transaction
-    const updatedCar = await prisma.$transaction(async (tx) => {
-      // Delete existing relations
-      await tx.carImage.deleteMany({ where: { carId: id } });
-      await tx.carFeature.deleteMany({ where: { carId: id } });
-      await tx.carSpecification.deleteMany({ where: { carId: id } });
-
-      // Update car with new relations
-      return await tx.car.update({
-        where: { id },
-        data: {
-          ...carData,
-
-          // Create new images
-          images: {
-            create: (data.images || []).map((img: { url: string; altText?: string; isPrimary?: boolean }, index: number) => ({
-              url: img.url,
-              altText: img.altText || carData.name,
-              order: index,
-              isPrimary: img.isPrimary || index === 0,
-            }))
-          },
-
-          // Create new features
-          features: {
-            create: (data.features || []).map((feature: string, index: number) => ({
-              feature,
-              order: index,
-            }))
-          },
-
-          // Create new specifications
-          specifications: {
-            create: (data.specifications || []).map((spec: { label: string; value: string }, index: number) => ({
-              label: spec.label,
-              value: spec.value,
-              order: index,
-            }))
-          },
-        },
-        include: {
-          images: true,
-          features: true,
-          specifications: true,
-        }
-      });
+    // Update car
+    const updatedCar = await prisma.vehicles.update({
+      where: { id },
+      data: carData
+      // Note: images, features, specifications relations don't exist in schema
+      // data: {
+      //   ...carData,
+      //   // Create new images
+      //   images: {
+      //     create: (data.images || []).map((img: { url: string; altText?: string; isPrimary?: boolean }, index: number) => ({
+      //       url: img.url,
+      //       altText: img.altText || carData.name,
+      //       order: index,
+      //       isPrimary: img.isPrimary || index === 0,
+      //     }))
+      //   },
+      //   // Create new features
+      //   features: {
+      //     create: (data.features || []).map((feature: string, index: number) => ({
+      //       feature,
+      //       order: index,
+      //     }))
+      //   },
+      //   // Create new specifications
+      //   specifications: {
+      //     create: (data.specifications || []).map((spec: { label: string; value: string }, index: number) => ({
+      //       label: spec.label,
+      //       value: spec.value,
+      //       order: index,
+      //     }))
+      //   },
+      // },
+      // include: {
+      //   images: true,
+      //   features: true,
+      //   specifications: true,
+      // }
     });
 
     // Log the activity
@@ -234,20 +227,20 @@ export async function PUT(
     //     entity: 'car',
     //     entityId: updatedCar.id,
     //     metadata: {
-    //       carName: updatedCar.name,
+    //       carName: `${updatedCar.make} ${updatedCar.model}`,
     //       changes: {
     //         from: {
-    //           brand: existingCar.brand,
+    //           make: existingCar.make,
     //           model: existingCar.model,
     //           year: existingCar.year,
-    //           price: existingCar.priceEur,
+    //           price: existingCar.price,
     //           status: existingCar.status,
     //         },
     //         to: {
-    //           brand: updatedCar.brand,
+    //           make: updatedCar.make,
     //           model: updatedCar.model,
     //           year: updatedCar.year,
-    //           price: updatedCar.priceEur,
+    //           price: updatedCar.price,
     //           status: updatedCar.status,
     //         }
     //       }
@@ -298,7 +291,7 @@ export async function DELETE(
     }
 
     // Check if car exists
-    const existingCar = await prisma.car.findUnique({
+    const existingCar = await prisma.vehicles.findUnique({
       where: { id }
     });
 
@@ -321,7 +314,7 @@ export async function DELETE(
     // }
 
     // Delete car (related records will be deleted via CASCADE)
-    await prisma.car.delete({
+    await prisma.vehicles.delete({
       where: { id }
     });
 
@@ -334,11 +327,11 @@ export async function DELETE(
     //     entity: 'car',
     //     entityId: id,
     //     metadata: {
-    //       carName: existingCar.name,
-    //       brand: existingCar.brand,
+    //       carName: `${existingCar.make} ${existingCar.model}`,
+    //       make: existingCar.make,
     //       model: existingCar.model,
     //       year: existingCar.year,
-    //       price: existingCar.priceEur,
+    //       price: existingCar.price,
     //     }
     //   }
     // });

@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, Car, Clock, MapPin, Shield, CheckCircle } from 'lucide-react';
-import TestDriveScheduler from '../components/TestDriveScheduler';
+import { TestDriveScheduler } from '../components/features/cars';
 
 export const metadata: Metadata = {
   title: 'Varaa koeajo | Kroi Auto Center',

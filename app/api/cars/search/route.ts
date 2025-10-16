@@ -5,9 +5,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { searchCars, getAllBrands, getCarCountByCategory } from '@/app/lib/db/cars';
-import { CarCategory, CarStatus } from '@prisma/client';
-import { cacheApiResponse } from '@/app/lib/cache';
-import { CACHE_KEYS, CACHE_DURATION } from '@/app/lib/redis';
+import { CarCategory, CarStatus } from '@/types/prisma';
+import { cacheApiResponse } from '@/app/lib/core/cache';
+import { CACHE_KEYS, CACHE_DURATION } from '@/app/lib/integrations/redis';
 
 export async function GET(request: NextRequest) {
   try {
@@ -25,14 +25,14 @@ export async function GET(request: NextRequest) {
     // Parse pagination
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
-    const sortBy = (searchParams.get('sortBy') || 'createdAt') as 'name' | 'priceEur' | 'year' | 'kmNumber' | 'createdAt';
+    const sortBy = (searchParams.get('sortBy') || 'createdAt') as 'make' | 'price' | 'year' | 'mileage' | 'createdAt';
     const sortOrder = (searchParams.get('sortOrder') || 'desc') as 'asc' | 'desc';
 
     // Parse filters
     const filters: Record<string, string | number | CarCategory | CarStatus> = {};
 
-    if (searchParams.get('brand')) {
-      filters.brand = searchParams.get('brand')!;
+    if (searchParams.get('make')) {
+      filters.make = searchParams.get('make')!;
     }
 
     if (searchParams.get('category')) {
@@ -61,8 +61,8 @@ export async function GET(request: NextRequest) {
       filters.maxYear = parseInt(searchParams.get('maxYear')!);
     }
 
-    if (searchParams.get('fuel')) {
-      filters.fuel = searchParams.get('fuel')!;
+    if (searchParams.get('fuelType')) {
+      filters.fuelType = searchParams.get('fuelType')!;
     }
 
     if (searchParams.get('transmission')) {

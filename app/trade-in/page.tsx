@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, Car, CheckCircle, Clock, Euro, FileText, Zap } from 'lucide-react';
-import TradeInEstimator from '../components/TradeInEstimator';
+import { TradeInEstimator } from '../components/features/trade-in';
 
 export const metadata: Metadata = {
   title: 'Vaihtoauton arviointi | Kroi Auto Center',

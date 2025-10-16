@@ -5,14 +5,15 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/lib/auth';
-import { PrismaClient, CarStatus, CarCategory } from '@prisma/client';
+import { authOptions } from '@/app/lib/core/auth';
+import { PrismaClient } from '@prisma/client';
+import { CarStatus } from '@/types/prisma';
 
 const prisma = new PrismaClient();
 
 // Helper function to generate slug from car name
-function generateSlug(brand: string, model: string, year: number): string {
-  const name = `${brand} ${model} ${year}`;
+function generateSlug(make: string, model: string, year: number): string {
+  const name = `${make} ${model} ${year}`;
   return name
     .toLowerCase()
     .replace(/[åä]/g, 'a')
@@ -28,7 +29,7 @@ async function getUniqueSlug(baseSlug: string): Promise<string> {
   let slug = baseSlug;
   let counter = 1;
 
-  while (await prisma.car.findUnique({ where: { slug } })) {
+  while (await prisma.vehicles.findUnique({ where: { slug } })) {
     slug = `${baseSlug}-${counter}`;
     counter++;
   }
@@ -59,7 +60,7 @@ export async function POST(request: NextRequest) {
     const data = await request.json();
 
     // Validate required fields
-    const requiredFields = ['brand', 'model', 'year', 'priceEur', 'description'];
+    const requiredFields = ['make', 'model', 'year', 'price', 'description'];
     for (const field of requiredFields) {
       if (!data[field]) {
         return NextResponse.json(
@@ -70,71 +71,72 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate slug
-    const baseSlug = generateSlug(data.brand, data.model, data.year);
+    const baseSlug = generateSlug(data.make, data.model, data.year);
     const slug = await getUniqueSlug(baseSlug);
 
-    // Prepare car data
+    // Prepare car data (matching vehicles schema)
     const carData = {
       slug,
-      name: data.name || `${data.brand} ${data.model}`,
-      brand: data.brand,
+      make: data.make,
       model: data.model,
       year: parseInt(data.year),
-      priceEur: parseInt(data.priceEur),
-      fuel: data.fuel,
+      price: parseInt(data.price),
+      mileage: parseInt(data.mileage) || 0,
+      fuelType: data.fuelType,
       transmission: data.transmission,
-      kmNumber: parseInt(data.kmNumber) || 0,
-      color: data.color || null,
-      driveType: data.driveType || null,
-      engineSize: data.engineSize || null,
-      power: data.power ? parseInt(data.power) : null,
-      status: (data.status as CarStatus) || CarStatus.AVAILABLE,
-      condition: data.condition || 'GOOD',
-      category: data.category as CarCategory,
+      bodyType: data.bodyType,
+      color: data.color || '',
+      engineSize: data.engineSize || '',
+      drivetrain: data.drivetrain || '',
+      features: data.features || '',
+      images: data.images || '',
+      description: data.description || '',
       featured: Boolean(data.featured),
-      description: data.description,
-      detailedDescription: data.detailedDescription || [],
-      metaTitle: data.metaTitle || null,
-      metaDescription: data.metaDescription || null,
+      status: (data.status as CarStatus) || CarStatus.AVAILABLE,
+      vin: data.vin || null,
+      doors: data.doors ? parseInt(data.doors) : null,
+      seats: data.seats ? parseInt(data.seats) : null,
     };
 
-    // Create car with relations
-    const car = await prisma.car.create({
+    // Create car
+    const car = await prisma.vehicles.create({
       data: {
-        ...carData,
-
-        // Create images
-        images: {
-          create: (data.images || []).map((img: { url: string; altText?: string; isPrimary?: boolean }, index: number) => ({
-            url: img.url,
-            altText: img.altText || carData.name,
-            order: index,
-            isPrimary: img.isPrimary || index === 0,
-          }))
-        },
-
-        // Create features
-        features: {
-          create: (data.features || []).map((feature: string, index: number) => ({
-            feature,
-            order: index,
-          }))
-        },
-
-        // Create specifications
-        specifications: {
-          create: (data.specifications || []).map((spec: { label: string; value: string }, index: number) => ({
-            label: spec.label,
-            value: spec.value,
-            order: index,
-          }))
-        },
-      },
-      include: {
-        images: true,
-        features: true,
-        specifications: true,
+        id: `vehicle_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        ...carData
       }
+      // Note: images, features, specifications relations don't exist in schema
+      // data: {
+      //   ...carData,
+      //   // Create images
+      //   images: {
+      //     create: (data.images || []).map((img: { url: string; altText?: string; isPrimary?: boolean }, index: number) => ({
+      //       url: img.url,
+      //       altText: img.altText || `${carData.make} ${carData.model}`,
+      //       order: index,
+      //       isPrimary: img.isPrimary || index === 0,
+      //     }))
+      //   },
+      //   // Create features
+      //   features: {
+      //     create: (data.features || []).map((feature: string, index: number) => ({
+      //       feature,
+      //       order: index,
+      //     }))
+      //   },
+      //   // Create specifications
+      //   specifications: {
+      //     create: (data.specifications || []).map((spec: { label: string; value: string }, index: number) => ({
+      //       label: spec.label,
+      //       value: spec.value,
+      //       order: index,
+      //     }))
+      //   },
+      // },
+      // include: {
+      //   images: true,
+      //   features: true,
+      //   specifications: true,
+      // }
     });
 
     // Log the activity
@@ -146,11 +148,11 @@ export async function POST(request: NextRequest) {
     //     entity: 'car',
     //     entityId: car.id,
     //     metadata: {
-    //       carName: car.name,
-    //       brand: car.brand,
+    //       carName: `${car.make} ${car.model}`,
+    //       make: car.make,
     //       model: car.model,
     //       year: car.year,
-    //       price: car.priceEur,
+    //       price: car.price,
     //     }
     //   }
     // });

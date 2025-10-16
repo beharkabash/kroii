@@ -70,7 +70,7 @@ export default function TradeInValuationPage() {
     setError('');
 
     try {
-      const response = await fetch('/api/trade-in-valuations', {
+      const response = await fetch('/api/services/trade-in-valuations', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

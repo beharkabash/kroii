@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, Star, Plus } from 'lucide-react';
-import Testimonials from '../components/Testimonials';
+import { Testimonials } from '../components/features/testimonials';
 
 export const metadata: Metadata = {
   title: 'Asiakkaiden arvostelut | Kroi Auto Center',

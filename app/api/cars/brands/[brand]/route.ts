@@ -25,7 +25,7 @@ export async function GET(
     // Parse pagination
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
-    const sortBy = (searchParams.get('sortBy') || 'createdAt') as 'name' | 'priceEur' | 'year' | 'kmNumber' | 'createdAt';
+    const sortBy = (searchParams.get('sortBy') || 'createdAt') as 'make' | 'price' | 'year' | 'mileage' | 'createdAt';
     const sortOrder = (searchParams.get('sortOrder') || 'desc') as 'asc' | 'desc';
 
     const cars = await getCarsByBrand(decodeURIComponent(brand), {

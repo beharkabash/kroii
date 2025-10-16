@@ -5,10 +5,10 @@ import { Car, ArrowLeft, Phone, MessageCircle, Share2, Facebook, Check, MapPin, 
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
-import { getPlaceholder } from '@/app/lib/image-placeholder';
-import Testimonials from '@/app/components/Testimonials';
-import FinancingCalculator from '@/app/components/FinancingCalculator';
-import TestDriveScheduler from '@/app/components/TestDriveScheduler';
+import { getPlaceholder } from '@/app/lib/features/image-placeholder';
+import { Testimonials } from '@/app/components/features/testimonials';
+import { FinancingCalculator } from '@/app/components/features/financing';
+import { TestDriveScheduler } from '@/app/components/features/cars';
 
 interface CarImage {
   url: string;

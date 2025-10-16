@@ -1,10 +1,5 @@
 import type { NextConfig } from "next";
 import withBundleAnalyzer from "@next/bundle-analyzer";
-// @ts-expect-error - next-pwa doesn't have proper TypeScript types
-import withPWA from "next-pwa";
-import createNextIntlPlugin from 'next-intl/plugin';
-
-const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
 const bundleAnalyzer = withBundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
@@ -168,4 +163,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withNextIntl(bundleAnalyzer(pwa(nextConfig)));
+export default bundleAnalyzer(pwa(nextConfig));

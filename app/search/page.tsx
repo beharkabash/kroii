@@ -20,8 +20,8 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { CarWithDetails } from '@/app/lib/db/cars';
-import { getPlaceholder } from '@/app/lib/image-placeholder';
+import { Vehicle } from '@/app/lib/db/cars';
+import { getPlaceholder } from '@/app/lib/features/image-placeholder';
 
 interface SearchFilters {
   query: string;
@@ -44,7 +44,7 @@ export default function SearchPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const [cars, setCars] = useState<CarWithDetails[]>([]);
+  const [cars, setCars] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
@@ -454,19 +454,19 @@ export default function SearchPage() {
                   const convertedCar = {
                     id: car.slug,
                     slug: car.slug,
-                    name: car.name,
-                    brand: car.brand,
+                    name: `${car.make} ${car.model}`,
+                    brand: car.make,
                     model: car.model,
-                    price: `€${car.priceEur.toLocaleString()}`,
-                    priceEur: car.priceEur,
+                    price: `€${car.price.toLocaleString()}`,
+                    priceEur: car.price,
                     year: car.year.toString(),
-                    fuel: car.fuel,
+                    fuel: car.fuelType,
                     transmission: car.transmission,
-                    km: `${car.kmNumber.toLocaleString()} km`,
-                    kmNumber: car.kmNumber,
-                    image: car.images[0]?.url || '',
+                    km: `${car.mileage.toLocaleString()} km`,
+                    kmNumber: car.mileage,
+                    image: car.images || '',
                     description: car.description,
-                    category: car.category.toLowerCase()
+                    category: car.bodyType?.toLowerCase() || ''
                   };
 
                   return (

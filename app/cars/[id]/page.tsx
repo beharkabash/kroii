@@ -50,16 +50,16 @@ export async function generateMetadata({
   // Prepare car data for SEO generator
   const carSEOData = {
     id: dbCar.id,
-    make: dbCar.brand,
+    make: dbCar.make,
     model: dbCar.model,
     year: dbCar.year,
-    priceEur: dbCar.priceEur,
-    kmNumber: dbCar.kmNumber,
-    fuel: dbCar.fuel,
+    price: dbCar.price,
+    mileage: dbCar.mileage,
+    fuelType: dbCar.fuelType,
     transmission: dbCar.transmission,
     description: dbCar.description,
-    images: dbCar.images?.map(img => img.url) || [],
-    slug: dbCar.slug
+    images: dbCar.images ? (typeof dbCar.images === 'string' ? JSON.parse(dbCar.images) : dbCar.images).map((img: unknown) => typeof img === 'string' ? img : (img as { url: string }).url) : [],
+    slug: dbCar.slug || ''
   };
 
   // Generate enhanced metadata using SEO utilities
@@ -89,16 +89,16 @@ export default async function CarDetailPage({ params }: { params: Promise<{ id: 
   // Prepare car data for enhanced SEO generators
   const carSEOData = {
     id: dbCar.id,
-    make: dbCar.brand,
+    make: dbCar.make,
     model: dbCar.model,
     year: dbCar.year,
-    priceEur: dbCar.priceEur,
-    kmNumber: dbCar.kmNumber,
-    fuel: dbCar.fuel,
+    price: dbCar.price,
+    mileage: dbCar.mileage,
+    fuelType: dbCar.fuelType,
     transmission: dbCar.transmission,
     description: dbCar.description,
-    images: dbCar.images?.map(img => img.url) || [],
-    slug: dbCar.slug
+    images: dbCar.images ? (typeof dbCar.images === 'string' ? JSON.parse(dbCar.images) : dbCar.images).map((img: unknown) => typeof img === 'string' ? img : (img as { url: string }).url) : [],
+    slug: dbCar.slug || ''
   };
 
   // Generate enhanced structured data using SEO utilities
@@ -108,8 +108,8 @@ export default async function CarDetailPage({ params }: { params: Promise<{ id: 
   const breadcrumbItems = [
     { name: 'Etusivu', url: '/' },
     { name: 'Autot', url: '/cars' },
-    { name: dbCar.brand, url: `/cars/brand/${dbCar.brand.toLowerCase()}` },
-    { name: `${dbCar.brand} ${dbCar.model} ${dbCar.year}`, url: `/cars/${dbCar.slug}` }
+    { name: dbCar.make, url: `/cars/brand/${dbCar.make.toLowerCase()}` },
+    { name: `${dbCar.make} ${dbCar.model} ${dbCar.year}`, url: `/cars/${dbCar.slug}` }
   ];
   const breadcrumbJSONLD = SEOGenerator.generateBreadcrumbJSONLD(breadcrumbItems);
 

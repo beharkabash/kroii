@@ -72,7 +72,7 @@ export default function SubmitTestimonialPage() {
     setError('');
 
     try {
-      const response = await fetch('/api/testimonials', {
+      const response = await fetch('/api/services/testimonials', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

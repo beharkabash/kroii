@@ -5,8 +5,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getCarById, trackCarView } from '@/app/lib/db/cars';
-import { cacheApiResponse } from '@/app/lib/cache';
-import { CACHE_KEYS, CACHE_DURATION } from '@/app/lib/redis';
+import { cacheApiResponse } from '@/app/lib/core/cache';
+import { CACHE_KEYS, CACHE_DURATION } from '@/app/lib/integrations/redis';
 
 export async function GET(
   request: NextRequest,

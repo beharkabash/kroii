@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getCarsByCategory } from '@/app/lib/db/cars';
-import { CarCategory } from '@prisma/client';
+import { CarCategory } from '@/types/prisma';
 
 export async function GET(
   request: NextRequest,
@@ -37,7 +37,7 @@ export async function GET(
     // Parse pagination
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
-    const sortBy = (searchParams.get('sortBy') || 'createdAt') as 'name' | 'priceEur' | 'year' | 'kmNumber' | 'createdAt';
+    const sortBy = (searchParams.get('sortBy') || 'createdAt') as 'make' | 'price' | 'year' | 'mileage' | 'createdAt';
     const sortOrder = (searchParams.get('sortOrder') || 'desc') as 'asc' | 'desc';
 
     const cars = await getCarsByCategory(categoryEnum, {

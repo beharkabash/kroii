@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, CreditCard, CheckCircle, Calculator, FileText, Users, Shield } from 'lucide-react';
-import FinancingCalculator from '../components/FinancingCalculator';
+import { FinancingCalculator } from '../components/features/financing';
 
 export const metadata: Metadata = {
   title: 'Autorahoitus | Kroi Auto Center',

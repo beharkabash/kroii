@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next';
-import { getAllCars, getAllBrands } from './lib/db/cars';
-import { CarCategory } from '@prisma/client';
+import { getAllCars, getAvailableBrands } from '@/app/lib/db/cars';
+import { CarCategory } from '@/types/prisma';
 
 /**
  * Dynamic sitemap generation for SEO
@@ -22,19 +22,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       },
     ];
 
-    // Get all cars from database
-    const { cars } = await getAllCars({}, { limit: 1000 });
+    // Get all cars from static data
+    const { data: cars } = await getAllCars({}, { page: 1, limit: 1000, sortBy: 'name', sortOrder: 'asc' });
 
     // Dynamic car detail pages
     const carPages: MetadataRoute.Sitemap = cars.map((car) => ({
       url: `${baseUrl}/cars/${car.slug}`,
-      lastModified: car.updatedAt?.toISOString() || currentDate,
+      lastModified: currentDate,
       changeFrequency: 'weekly' as const,
       priority: 0.8,
     }));
 
     // Get all brands for brand pages
-    const brands = await getAllBrands();
+    const brands = await getAvailableBrands();
     const brandPages: MetadataRoute.Sitemap = brands.map((brand) => ({
       url: `${baseUrl}/cars/brand/${encodeURIComponent(brand.toLowerCase())}`,
       lastModified: currentDate,

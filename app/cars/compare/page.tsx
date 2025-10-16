@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useComparisonStore, COMPARISON_CATEGORIES, formatComparisonValue, calculateComparisonScore } from '@/app/lib/comparison-store';
+import { useComparisonStore, COMPARISON_CATEGORIES, formatComparisonValue, calculateComparisonScore } from '@/app/lib/features/comparison-store';
 import { ArrowLeft, X, Scale, Trophy, Star } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { cn } from '@/app/lib/utils';
-import Breadcrumbs from '@/app/components/Breadcrumbs';
+import { cn } from '@/app/lib/core/utils';
+import { Breadcrumbs } from '@/app/components/layout/navigation';
 
 export default function ComparisonPage() {
   const { comparedCars, removeFromComparison, clearComparison } = useComparisonStore();

@@ -6,18 +6,7 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getCarsByCategory, convertToLegacyFormat } from '@/app/lib/db/cars';
-import { CarCategory } from '@prisma/client';
-
-// Fallback enum if not available from Prisma
-const CarCategoryFallback = {
-  SEDAN: 'SEDAN',
-  SUV: 'SUV',
-  HATCHBACK: 'HATCHBACK',
-  TRUCK: 'TRUCK',
-  VAN: 'VAN',
-  COUPE: 'COUPE',
-  OTHER: 'OTHER'
-} as const;
+import { CarCategory } from '@/types/prisma';
 import CategoryPageContent from './CategoryPageContent';
 
 // Force dynamic rendering to avoid database issues during build
@@ -74,13 +63,13 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const { category } = await params;
 
   // Validate category
-  const validCategories = Object.values(CarCategory || CarCategoryFallback).map(cat => cat.toLowerCase());
+  const validCategories = Object.values(CarCategory).map(cat => cat.toLowerCase());
   if (!validCategories.includes(category.toLowerCase())) {
     notFound();
   }
 
   // Convert to enum value
-  const categoryEnum = category.toUpperCase() as keyof typeof CarCategory;
+  const categoryEnum = CarCategory[category.toUpperCase() as keyof typeof CarCategory];
 
   try {
     // Get cars in this category with fallback for missing database

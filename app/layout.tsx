@@ -1,16 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Analytics } from "./components/Analytics";
-import { WebVitals } from "./components/WebVitals";
-import { ServiceWorkerRegister } from "./components/ServiceWorkerRegister";
-import PWAInstallPrompt from "./components/PWAInstallPrompt";
-import PWAStatus from "./components/PWAStatus";
-import ComparisonWidget from "./components/ComparisonWidget";
-import WhatsAppChat from "./components/WhatsAppChat";
-import { SEOGenerator } from "./lib/seo-utils";
-import { TranslationProvider } from "./lib/i18n/provider";
-import { Suspense } from "react";
+import { ComparisonWidget } from "./components/features/comparison";
+import { WhatsAppChat } from "./components/integrations/chat";
+import { SEOGenerator } from "./lib/features/seo-utils";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -90,18 +83,9 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
-        <ServiceWorkerRegister />
-        <Suspense fallback={null}>
-          <Analytics />
-        </Suspense>
-        <WebVitals />
-        <PWAStatus />
-        <PWAInstallPrompt />
         <ComparisonWidget />
         <WhatsAppChat />
-        <TranslationProvider>
-          {children}
-        </TranslationProvider>
+        {children}
       </body>
     </html>
   );

@@ -122,7 +122,7 @@ export default function FinancingApplicationPage() {
     setError('');
 
     try {
-      const response = await fetch('/api/finance-applications', {
+      const response = await fetch('/api/services/finance-applications', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

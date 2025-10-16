@@ -6,7 +6,7 @@
  */
 
 import { LegacyCarFormat as CarType } from '@/app/lib/db/cars';
-import { getPlaceholder } from '@/app/lib/image-placeholder';
+import { getPlaceholder } from '@/app/lib/features/image-placeholder';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft,

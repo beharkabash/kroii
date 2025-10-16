@@ -713,6 +713,6 @@ export default function HomeContent({ cars }: HomeContentProps) {
         </div>
       </section>
 
-    </div> {/* Footer is now handled by PageLayout */}
+    </div>
   );
 }

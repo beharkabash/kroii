@@ -25,7 +25,25 @@ import {
 } from 'lucide-react';
 import { cn } from '../lib/core/utils';
 import { cars, Car } from '../data/cars';
-import { getAllCars, CarFilters, PaginationOptions } from '../lib/db/cars';
+// Simple types for filters and pagination
+interface CarFilters {
+  query?: string;
+  brand?: string;
+  category?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  minYear?: number;
+  maxYear?: number;
+  fuel?: string;
+  transmission?: string;
+}
+
+interface PaginationOptions {
+  page: number;
+  limit: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
 
 // Animation variants
 const fadeInUp = {

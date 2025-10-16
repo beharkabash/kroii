@@ -1,6 +1,16 @@
 import { MetadataRoute } from 'next';
-import { getAllCars, getAvailableBrands } from '@/app/lib/db/cars';
-import { CarCategory } from '@/types/prisma';
+import { cars } from '@/app/data/cars';
+
+// Simple category enum
+const CarCategory = {
+  PREMIUM: 'premium',
+  FAMILY: 'family',
+  SUV: 'suv',
+  COMPACT: 'compact',
+  SPORTS: 'sports',
+  LUXURY: 'luxury',
+  ELECTRIC: 'electric'
+} as const;
 
 /**
  * Dynamic sitemap generation for SEO
@@ -22,9 +32,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       },
     ];
 
-    // Get all cars from static data
-    const { data: cars } = await getAllCars({}, { page: 1, limit: 1000, sortBy: 'name', sortOrder: 'asc' });
-
     // Dynamic car detail pages
     const carPages: MetadataRoute.Sitemap = cars.map((car) => ({
       url: `${baseUrl}/cars/${car.slug}`,
@@ -34,7 +41,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
 
     // Get all brands for brand pages
-    const brands = await getAvailableBrands();
+    const brands = [...new Set(cars.map(car => car.brand))];
     const brandPages: MetadataRoute.Sitemap = brands.map((brand) => ({
       url: `${baseUrl}/cars/brand/${encodeURIComponent(brand.toLowerCase())}`,
       lastModified: currentDate,
@@ -45,7 +52,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Category pages
     const categories = Object.values(CarCategory);
     const categoryPages: MetadataRoute.Sitemap = categories.map((category) => ({
-      url: `${baseUrl}/cars/category/${category.toLowerCase()}`,
+      url: `${baseUrl}/cars/category/${category}`,
       lastModified: currentDate,
       changeFrequency: 'weekly' as const,
       priority: 0.6,

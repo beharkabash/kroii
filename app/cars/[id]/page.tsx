@@ -1,5 +1,5 @@
 import { CarDetailContent } from './CarDetailContent';
-import { getCarById, getRelatedCars, convertToLegacyFormat } from '@/app/lib/db/cars';
+import { getCarById, getRelatedCars } from '@/app/data/cars';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { SEOGenerator } from '@/app/lib/seo-utils';
@@ -13,14 +13,7 @@ export const dynamic = 'force-dynamic';
  */
 export async function generateStaticParams() {
   try {
-    if (!process.env.DATABASE_URL) {
-      return [];
-    }
-    const { cars } = await import('@/app/lib/db/cars').then(async (module) => {
-      const result = await module.getAllCars({}, { limit: 1000 });
-      return result;
-    });
-
+    const { cars } = await import('@/app/data/cars');
     return cars.map((car) => ({
       id: car.slug,
     }));
@@ -39,9 +32,9 @@ export async function generateMetadata({
   params: Promise<{ id: string }>
 }): Promise<Metadata> {
   const { id } = await params;
-  const dbCar = await getCarById(id);
+  const car = getCarById(id);
 
-  if (!dbCar) {
+  if (!car) {
     return {
       title: 'Auto ei löytynyt - Kroi Auto Center',
     };
@@ -49,21 +42,30 @@ export async function generateMetadata({
 
   // Prepare car data for SEO generator
   const carSEOData = {
-    id: dbCar.id,
-    make: dbCar.make,
-    model: dbCar.model,
-    year: dbCar.year,
-    price: dbCar.price,
-    mileage: dbCar.mileage,
-    fuelType: dbCar.fuelType,
-    transmission: dbCar.transmission,
-    description: dbCar.description,
-    images: dbCar.images ? (typeof dbCar.images === 'string' ? JSON.parse(dbCar.images) : dbCar.images).map((img: unknown) => typeof img === 'string' ? img : (img as { url: string }).url) : [],
-    slug: dbCar.slug || ''
+    id: car.id,
+    make: car.brand,
+    model: car.model,
+    year: parseInt(car.year),
+    price: car.priceEur,
+    mileage: car.kmNumber,
+    fuelType: car.fuel,
+    transmission: car.transmission,
+    description: car.description,
+    images: [car.image],
+    slug: car.slug
   };
 
   // Generate enhanced metadata using SEO utilities
-  return SEOGenerator.generateCarMetadata(carSEOData);
+  return {
+    title: `${car.name} ${car.year} - ${car.price} | Kroi Auto Center`,
+    description: car.description,
+    keywords: [car.brand, car.model, car.year, car.fuel, car.transmission, 'käytetty auto', 'auto myynti', 'Kroi Auto'].join(', '),
+    openGraph: {
+      title: `${car.name} ${car.year} - ${car.price} | Kroi Auto Center`,
+      description: car.description,
+      images: [car.image]
+    }
+  };
 }
 
 /**
@@ -72,58 +74,32 @@ export async function generateMetadata({
  */
 export default async function CarDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const dbCar = await getCarById(id);
+  const car = getCarById(id);
 
   // Return 404 if car not found
-  if (!dbCar) {
+  if (!car) {
     notFound();
   }
 
-  // Convert to legacy format for compatibility
-  const car = convertToLegacyFormat(dbCar);
-
   // Get related cars
-  const dbRelatedCars = await getRelatedCars(dbCar.id);
-  const relatedCars = dbRelatedCars.map(convertToLegacyFormat);
+  const relatedCars = getRelatedCars(car.id);
 
   // Prepare car data for enhanced SEO generators
   const carSEOData = {
-    id: dbCar.id,
-    make: dbCar.make,
-    model: dbCar.model,
-    year: dbCar.year,
-    price: dbCar.price,
-    mileage: dbCar.mileage,
-    fuelType: dbCar.fuelType,
-    transmission: dbCar.transmission,
-    description: dbCar.description,
-    images: dbCar.images ? (typeof dbCar.images === 'string' ? JSON.parse(dbCar.images) : dbCar.images).map((img: unknown) => typeof img === 'string' ? img : (img as { url: string }).url) : [],
-    slug: dbCar.slug || ''
+    id: car.id,
+    make: car.brand,
+    model: car.model,
+    year: parseInt(car.year),
+    price: car.priceEur,
+    mileage: car.kmNumber,
+    fuelType: car.fuel,
+    transmission: car.transmission,
+    description: car.description,
+    images: [car.image],
+    slug: car.slug
   };
 
-  // Generate enhanced structured data using SEO utilities
-  const carJSONLD = SEOGenerator.generateCarJSONLD(carSEOData);
-
-  // Generate breadcrumb structured data
-  const breadcrumbItems = [
-    { name: 'Etusivu', url: '/' },
-    { name: 'Autot', url: '/cars' },
-    { name: dbCar.make, url: `/cars/brand/${dbCar.make.toLowerCase()}` },
-    { name: `${dbCar.make} ${dbCar.model} ${dbCar.year}`, url: `/cars/${dbCar.slug}` }
-  ];
-  const breadcrumbJSONLD = SEOGenerator.generateBreadcrumbJSONLD(breadcrumbItems);
-
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(carJSONLD) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJSONLD) }}
-      />
-      <CarDetailContent car={car} relatedCars={relatedCars} />
-    </>
+    <CarDetailContent car={car} relatedCars={relatedCars} />
   );
 }

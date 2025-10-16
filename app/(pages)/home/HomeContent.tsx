@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { Car, Target, Heart, Users, TrendingUp, Phone, Mail, MapPin, Clock, Facebook, Instagram, Send, MessageCircle } from 'lucide-react';
+import { Car as CarIcon, Target, Heart, Users, TrendingUp, Phone, Mail, MapPin, Clock, Facebook, Instagram, Send, MessageCircle } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -191,7 +191,7 @@ export default function HomeContent({ cars }: HomeContentProps) {
                     ease: "easeInOut"
                   }}
                 >
-                  <Car className="h-32 w-32 md:h-48 md:w-48 text-white opacity-30" />
+                  <CarIcon className="h-32 w-32 md:h-48 md:w-48 text-white opacity-30" />
                 </motion.div>
               </motion.div>
             </motion.div>
@@ -279,7 +279,7 @@ export default function HomeContent({ cars }: HomeContentProps) {
                         />
                       ) : (
                         <div className="h-full flex items-center justify-center">
-                          <Car className="h-24 w-24 text-purple-400" />
+                          <CarIcon className="h-24 w-24 text-purple-400" />
                         </div>
                       )}
                     </div>

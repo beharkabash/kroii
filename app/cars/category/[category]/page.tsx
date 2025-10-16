@@ -5,8 +5,18 @@
 
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { getCarsByCategory, convertToLegacyFormat } from '@/app/lib/db/cars';
-import { CarCategory } from '@/types/prisma';
+import { getCarsByCategory } from '@/app/data/cars';
+
+// Simple category enum
+const CarCategory = {
+  PREMIUM: 'premium',
+  FAMILY: 'family',
+  SUV: 'suv',
+  COMPACT: 'compact',
+  SPORTS: 'sports',
+  LUXURY: 'luxury',
+  ELECTRIC: 'electric'
+} as const;
 import CategoryPageContent from './CategoryPageContent';
 
 // Force dynamic rendering to avoid database issues during build
@@ -20,7 +30,7 @@ interface CategoryPageProps {
 export async function generateStaticParams() {
   const categories = Object.values(CarCategory);
   return categories.map((category) => ({
-    category: category.toLowerCase()
+    category: category
   }));
 }
 
@@ -63,26 +73,14 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const { category } = await params;
 
   // Validate category
-  const validCategories = Object.values(CarCategory).map(cat => cat.toLowerCase());
-  if (!validCategories.includes(category.toLowerCase())) {
+  const validCategories = Object.values(CarCategory);
+  if (!validCategories.includes(category as any)) {
     notFound();
   }
 
-  // Convert to enum value
-  const categoryEnum = CarCategory[category.toUpperCase() as keyof typeof CarCategory];
-
   try {
-    // Get cars in this category with fallback for missing database
-    let cars: ReturnType<typeof convertToLegacyFormat>[] = [];
-
-    if (process.env.DATABASE_URL) {
-      const dbCars = await getCarsByCategory(categoryEnum, {
-        limit: 50,
-        sortBy: 'createdAt',
-        sortOrder: 'desc'
-      });
-      cars = dbCars.map(convertToLegacyFormat);
-    }
+    // Get cars in this category
+    const categoryCars = getCarsByCategory(category);
 
     const categoryNames: Record<string, string> = {
       'premium': 'Premium-autot',
@@ -109,7 +107,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
     return (
       <CategoryPageContent
-        cars={cars}
+        cars={categoryCars}
         categoryName={categoryName}
         categoryDescription={categoryDescription}
         category={category}

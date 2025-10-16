@@ -20,7 +20,21 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Vehicle } from '@/app/lib/db/cars';
+// Simple Vehicle interface to match the API response
+interface Vehicle {
+  id: string;
+  slug: string;
+  make: string;
+  model: string;
+  price: number;
+  year: number;
+  fuelType: string;
+  transmission: string;
+  mileage: number;
+  images: string;
+  description: string;
+  bodyType?: string;
+}
 import { getPlaceholder } from '@/app/lib/features/image-placeholder';
 
 interface SearchFilters {

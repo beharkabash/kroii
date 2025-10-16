@@ -615,7 +615,7 @@ export default function TradeInEstimator({
               )}
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

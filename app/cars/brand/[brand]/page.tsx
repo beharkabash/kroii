@@ -5,7 +5,7 @@
 
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { getCarsByBrand, convertToLegacyFormat, getAllBrands } from '@/app/lib/db/cars';
+import { getCarsByBrand, cars } from '@/app/data/cars';
 import BrandPageContent from './BrandPageContent';
 
 // Force dynamic rendering to avoid database issues during build
@@ -18,7 +18,7 @@ interface BrandPageProps {
 // Generate static paths for all brands
 export async function generateStaticParams() {
   try {
-    const brands = await getAllBrands();
+    const brands = [...new Set(cars.map(car => car.brand))];
     return brands.map((brand) => ({
       brand: brand.toLowerCase().replace(/\s+/g, '-')
     }));
@@ -63,29 +63,19 @@ export default async function BrandPage({ params }: BrandPageProps) {
   const decodedBrand = decodeURIComponent(brand).replace(/-/g, ' ');
 
   try {
-    // Get cars from this brand with fallback for missing database
-    let cars: ReturnType<typeof convertToLegacyFormat>[] = [];
+    // Get cars from this brand
+    const brandCars = getCarsByBrand(decodedBrand);
 
-    if (process.env.DATABASE_URL) {
-      const dbCars = await getCarsByBrand(decodedBrand, {
-        limit: 50,
-        sortBy: 'createdAt',
-        sortOrder: 'desc'
-      });
+    // If no cars found, check if brand exists at all
+    if (brandCars.length === 0) {
+      const allBrands = [...new Set(cars.map(car => car.brand))];
+      const brandExists = allBrands.some(b =>
+        b.toLowerCase().replace(/\s+/g, '-') === brand.toLowerCase()
+      );
 
-      // If no cars found, check if brand exists at all
-      if (dbCars.length === 0) {
-        const allBrands = await getAllBrands();
-        const brandExists = allBrands.some(b =>
-          b.toLowerCase().replace(/\s+/g, '-') === brand.toLowerCase()
-        );
-
-        if (!brandExists) {
-          notFound();
-        }
+      if (!brandExists) {
+        notFound();
       }
-
-      cars = dbCars.map(convertToLegacyFormat);
     }
 
     const brandName = decodedBrand
@@ -111,7 +101,7 @@ export default async function BrandPage({ params }: BrandPageProps) {
 
     return (
       <BrandPageContent
-        cars={cars}
+        cars={brandCars}
         brandName={brandName}
         brandDescription={brandDescription}
         brand={brand}

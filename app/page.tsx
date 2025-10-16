@@ -105,7 +105,7 @@ export default function Home() {
         "itemOffered": {
           "@type": "Car",
           "name": car.name,
-          "brand": car.make,
+          "brand": car.brand,
           "model": car.model,
           "vehicleModelDate": car.year,
           "fuelType": car.fuel,

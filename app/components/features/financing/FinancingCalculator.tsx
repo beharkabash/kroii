@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calculator, CreditCard, Calendar, Percent, Info, Euro, Phone, MessageCircle, TrendingUp, TrendingDown, CheckCircle, AlertCircle, Sparkles, ChevronUp, ChevronDown } from 'lucide-react';
-import Link from 'next/link';
+import { Calculator, CreditCard, Calendar, Percent, Info, Euro, Phone, MessageCircle, TrendingUp, TrendingDown, CheckCircle, Sparkles, ChevronDown } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Input } from '@/app/components/ui/forms/Input';
 import { Button } from '@/app/components/ui/buttons/Button';
@@ -29,10 +28,19 @@ export default function FinancingCalculator({
   const [totalInterest, setTotalInterest] = useState(0);
   const [totalPayment, setTotalPayment] = useState(0);
   const [isCalculating, setIsCalculating] = useState(false);
-  const [showComparison, setShowComparison] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [isExpanded, setIsExpanded] = useState(!compact);
-  const [lastCalculation, setLastCalculation] = useState<any>(null);
+
+  interface Calculation {
+    loanAmount: number;
+    interestRate: number;
+    loanTerm: number;
+    monthlyPayment: number;
+    totalInterest: number;
+    totalPayment: number;
+  }
+
+  const [lastCalculation, setLastCalculation] = useState<Calculation | null>(null);
 
   // Debounced validation
   const validateInputs = useCallback(() => {

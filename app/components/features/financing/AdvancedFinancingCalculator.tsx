@@ -1,12 +1,9 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Calculator, CreditCard, Calendar, Percent, Info, Euro, Phone, MessageCircle, TrendingUp, PieChart, BarChart3, CheckCircle, AlertCircle, Sparkles, Target, Award, DollarSign } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Calculator, CreditCard, Calendar, Percent, Info, Euro, Phone, MessageCircle, TrendingUp, PieChart, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
-import confetti from 'canvas-confetti';
-import { Input } from '@/app/components/ui/forms/Input';
-import { Button } from '@/app/components/ui/buttons/Button';
 
 interface AdvancedFinancingCalculatorProps {
   vehiclePrice?: number;
@@ -39,9 +36,6 @@ export default function AdvancedFinancingCalculator({
   const [interestRate, setInterestRate] = useState(4.5);
   const [loanTerm, setLoanTerm] = useState(60);
   const [activeTab, setActiveTab] = useState<'calculator' | 'comparison' | 'schedule'>('calculator');
-  const [isCalculating, setIsCalculating] = useState(false);
-  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
-  const [showOptimalChoice, setShowOptimalChoice] = useState(false);
 
   // Validation
   const validateInputs = useCallback(() => {

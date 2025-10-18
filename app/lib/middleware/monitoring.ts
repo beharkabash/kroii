@@ -5,7 +5,7 @@
 
 export interface MonitoringEvent {
   name: string;
-  data?: any;
+  data?: unknown;
   timestamp?: Date;
 }
 
@@ -25,13 +25,13 @@ export class MonitoringService {
     return;
   }
 
-  static async trackError(error: Error, context?: any): Promise<void> {
+  static async trackError(error: Error, context?: unknown): Promise<void> {
     console.error('Monitoring stub - would track error:', error, context);
     return;
   }
 }
 
-export function withMonitoring<T extends any[], R>(
+export function withMonitoring<T extends unknown[], R>(
   fn: (...args: T) => Promise<R>,
   name: string
 ) {
@@ -56,7 +56,7 @@ export function withMonitoring<T extends any[], R>(
 // Legacy exports for compatibility
 export const APIMonitoring = {
   ...MonitoringService,
-  withMonitoring: <T extends (...args: any[]) => any>(fn: T, name?: string): T => {
+  withMonitoring: <T extends (...args: unknown[]) => unknown>(fn: T, _name?: string): T => {
     // Return the function as-is for stub implementation
     return fn;
   }

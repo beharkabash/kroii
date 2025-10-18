@@ -1,6 +1,6 @@
 'use client';
 
-import { PageLayout, AnimatedPageLayout, CarPageLayout, CategoryPageLayout } from '../PageLayout';
+import PageLayout, { AnimatedPageLayout, CarPageLayout, CategoryPageLayout } from '../PageLayout';
 import { BreadcrumbItem } from '../navigation/Breadcrumbs';
 
 // Example 1: Basic page layout

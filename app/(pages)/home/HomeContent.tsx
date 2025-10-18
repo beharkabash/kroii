@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Car as CarIcon, Target, Heart, Users, TrendingUp, Phone, Mail, MapPin, Clock, Facebook, Instagram, Send, MessageCircle } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';

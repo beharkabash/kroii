@@ -6,7 +6,7 @@
 export {
   EmailService as default,
   EmailService,
-  EmailOptions
+  type EmailOptions
 } from '@/app/lib/integrations/email-service';
 
 // Re-export specific methods for compatibility

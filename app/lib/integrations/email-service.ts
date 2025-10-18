@@ -54,7 +54,7 @@ export class EmailService {
     });
   }
 
-  static async notifyMatchingAlerts(matches: any[]): Promise<boolean> {
+  static async notifyMatchingAlerts(matches: unknown[]): Promise<boolean> {
     console.log('Email service stub - would notify matching alerts:', matches);
     return true;
   }

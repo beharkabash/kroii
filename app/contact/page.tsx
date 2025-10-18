@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { ArrowLeft, Mail, Phone, MapPin, Clock, Send, MessageCircle, Facebook, Instagram, CheckCircle, Loader2 } from 'lucide-react';
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import * as confetti from 'canvas-confetti';
+import confetti from 'canvas-confetti';
 import {
   ContactFormData,
   FormState,

@@ -11,39 +11,16 @@ import {
   Search,
   SlidersHorizontal,
   X,
-  Filter,
-  Grid3X3,
   Heart,
   Eye,
   ChevronUp,
-  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Loader2,
-  Star,
   ArrowUpDown
 } from 'lucide-react';
 import { cn } from '../lib/core/utils';
-import { cars, Car } from '../data/cars';
-// Simple types for filters and pagination
-interface CarFilters {
-  query?: string;
-  brand?: string;
-  category?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  minYear?: number;
-  maxYear?: number;
-  fuel?: string;
-  transmission?: string;
-}
-
-interface PaginationOptions {
-  page: number;
-  limit: number;
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
-}
+import { cars } from '../data/cars';
 
 // Animation variants
 const fadeInUp = {
@@ -52,28 +29,12 @@ const fadeInUp = {
   exit: { opacity: 0, y: -60 }
 };
 
-const fadeInLeft = {
-  initial: { opacity: 0, x: -60 },
-  animate: { opacity: 1, x: 0 }
-};
-
-const fadeInRight = {
-  initial: { opacity: 0, x: 60 },
-  animate: { opacity: 1, x: 0 }
-};
-
 const staggerContainer = {
   animate: {
     transition: {
       staggerChildren: 0.1
     }
   }
-};
-
-const scaleIn = {
-  initial: { opacity: 0, scale: 0.9 },
-  animate: { opacity: 1, scale: 1 },
-  exit: { opacity: 0, scale: 0.9 }
 };
 
 // Filter options
@@ -216,7 +177,7 @@ export default function AllCarsPage() {
 
     // Apply sorting
     filtered.sort((a, b) => {
-      let aValue: any, bValue: any;
+      let aValue: string | number, bValue: string | number;
 
       switch (currentSort.sortBy) {
         case 'price':
@@ -273,7 +234,7 @@ export default function AllCarsPage() {
   }, [updateURL]);
 
   // Handle filter changes
-  const handleFilterChange = useCallback((filterType: keyof ActiveFilters, value: any) => {
+  const handleFilterChange = useCallback((filterType: keyof ActiveFilters, value: ActiveFilters[keyof ActiveFilters]) => {
     const newFilters = { ...activeFilters, [filterType]: value };
     setActiveFilters(newFilters);
     setCurrentPage(1);
@@ -597,7 +558,7 @@ export default function AllCarsPage() {
                       animate={{ scale: 1 }}
                       exit={{ scale: 0 }}
                     >
-                      Haku: "{activeFilters.search}"
+                      Haku: &ldquo;{activeFilters.search}&rdquo;
                       <button
                         onClick={() => handleFilterChange('search', '')}
                         className="hover:bg-purple-200 rounded-full p-0.5"

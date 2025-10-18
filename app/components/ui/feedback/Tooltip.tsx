@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useState, useRef, useEffect } from 'react';
+import { ReactNode, useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/app/lib/core/utils';
 
@@ -33,7 +33,7 @@ const Tooltip = ({
   const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
   const triggerRef = useRef<HTMLDivElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const showTooltip = () => {
     if (timeoutRef.current) {
@@ -60,7 +60,7 @@ const Tooltip = ({
     }
   };
 
-  const updatePosition = () => {
+  const updatePosition = useCallback(() => {
     if (!triggerRef.current || !tooltipRef.current) return;
 
     const triggerRect = triggerRef.current.getBoundingClientRect();
@@ -99,7 +99,7 @@ const Tooltip = ({
     if (y + tooltipRect.height > viewport.height) y = viewport.height - tooltipRect.height - 8;
 
     setCoordinates({ x, y });
-  };
+  }, [position, offset]);
 
   useEffect(() => {
     if (isVisible) {
@@ -112,7 +112,7 @@ const Tooltip = ({
         window.removeEventListener('resize', updatePosition);
       };
     }
-  }, [isVisible]);
+  }, [isVisible, updatePosition]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -174,7 +174,7 @@ const Tooltip = ({
       y: 0,
       x: 0,
       transition: {
-        type: 'spring',
+        type: 'spring' as const,
         damping: 20,
         stiffness: 300,
         duration: 0.15,

@@ -1,9 +1,9 @@
 'use client';
 
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ZoomIn, X, Download, RotateCw, Move } from 'lucide-react';
+import { ZoomIn, X, Download, RotateCw } from 'lucide-react';
 import { cn } from '@/app/lib/core/utils';
 
 interface OptimizedImageProps {
@@ -63,7 +63,7 @@ const OptimizedImage = ({
     </svg>`
   ).toString('base64')}`;
 
-  const errorPlaceholder = `data:image/svg+xml;base64,${Buffer.from(
+  const _errorPlaceholder = `data:image/svg+xml;base64,${Buffer.from(
     `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
       <rect width="${width}" height="${height}" fill="#fee2e2"/>
       <text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="#dc2626" font-size="14">
@@ -104,11 +104,11 @@ const OptimizedImage = ({
   };
 
   // Reset lightbox state
-  const resetLightbox = () => {
+  const resetLightbox = useCallback(() => {
     setImageRotation(0);
     setImageScale(1);
     setImagePosition({ x: 0, y: 0 });
-  };
+  }, []);
 
   // Close lightbox
   const closeLightbox = () => {
@@ -120,7 +120,8 @@ const OptimizedImage = ({
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isLightboxOpen) {
-        closeLightbox();
+        setIsLightboxOpen(false);
+        resetLightbox();
       }
     };
 
@@ -133,7 +134,7 @@ const OptimizedImage = ({
       document.removeEventListener('keydown', handleEscape);
       document.body.style.overflow = 'unset';
     };
-  }, [isLightboxOpen]);
+  }, [isLightboxOpen, resetLightbox]);
 
   if (hasError) {
     if (errorFallback) {

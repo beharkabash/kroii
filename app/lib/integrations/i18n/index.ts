@@ -3,9 +3,9 @@
  */
 
 export const i18n = {
-  t: (key: string, ...args: any[]) => key,
+  t: (key: string, ..._args: unknown[]) => key,
   locale: 'fi',
-  changeLanguage: (locale: string) => Promise.resolve()
+  changeLanguage: (_locale: string) => Promise.resolve()
 };
 
 export default i18n;

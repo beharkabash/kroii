@@ -99,9 +99,15 @@ export default async function BrandPage({ params }: BrandPageProps) {
     const brandDescription = brandDescriptions[decodedBrand.toLowerCase()] ||
       `Tutustu ${brandName} automerkki valikoimaamme. Laadukkaita ja tarkastettuja käytettyjä autoja.`;
 
+    // Transform cars to match expected interface
+    const transformedCars = brandCars.map(car => ({
+      ...car,
+      features: car.features?.map(f => ({ feature: f }))
+    }));
+
     return (
       <BrandPageContent
-        cars={brandCars}
+        cars={transformedCars}
         brandName={brandName}
         brandDescription={brandDescription}
         brand={brand}

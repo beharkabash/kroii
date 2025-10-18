@@ -8,8 +8,12 @@ export interface LeadScore {
   priority: 'low' | 'medium' | 'high' | 'urgent';
 }
 
+interface LeadData {
+  [key: string]: unknown;
+}
+
 export class LeadScoringService {
-  static calculateScore(data: any): LeadScore {
+  static calculateScore(_data: LeadData): LeadScore {
     // Stub implementation
     return {
       score: 50,
@@ -18,7 +22,7 @@ export class LeadScoringService {
     };
   }
 
-  static updateScore(leadId: string, newData: any): Promise<LeadScore> {
+  static updateScore(_leadId: string, newData: LeadData): Promise<LeadScore> {
     // Stub implementation
     return Promise.resolve(this.calculateScore(newData));
   }

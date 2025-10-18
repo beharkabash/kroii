@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 import Header from './header/Header';
 import Footer from './footer/Footer';
 import Breadcrumbs, { BreadcrumbItem } from './navigation/Breadcrumbs';
@@ -21,7 +21,7 @@ export default function PageLayout({
   className = '',
   pageKey = 'default'
 }: PageLayoutProps) {
-  const pageVariants = {
+  const pageVariants: Variants = {
     initial: {
       opacity: 0,
       y: 20,
@@ -33,7 +33,7 @@ export default function PageLayout({
       scale: 1,
       transition: {
         duration: 0.4,
-        ease: "easeOut"
+        ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] // Custom cubic bezier for easeOut
       }
     },
     out: {
@@ -42,7 +42,7 @@ export default function PageLayout({
       scale: 0.98,
       transition: {
         duration: 0.3,
-        ease: "easeIn"
+        ease: [0.4, 0, 0.6, 1] as [number, number, number, number] // Custom cubic bezier for easeIn
       }
     }
   };
@@ -103,13 +103,13 @@ export function AnimatedPageLayout({
   pageKey = 'default',
   animationType = 'default'
 }: PageLayoutProps & { animationType?: 'slide' | 'fade' | 'scale' | 'default' }) {
-  const getPageVariants = () => {
+  const getPageVariants = (): Variants => {
     switch (animationType) {
       case 'slide':
         return {
           initial: { opacity: 0, x: 50 },
-          in: { opacity: 1, x: 0, transition: { duration: 0.5, ease: "easeOut" } },
-          out: { opacity: 0, x: -50, transition: { duration: 0.3, ease: "easeIn" } }
+          in: { opacity: 1, x: 0, transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] } },
+          out: { opacity: 0, x: -50, transition: { duration: 0.3, ease: [0.4, 0, 0.6, 1] as [number, number, number, number] } }
         };
       case 'fade':
         return {
@@ -120,14 +120,14 @@ export function AnimatedPageLayout({
       case 'scale':
         return {
           initial: { opacity: 0, scale: 0.9 },
-          in: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: "easeOut" } },
-          out: { opacity: 0, scale: 1.1, transition: { duration: 0.3, ease: "easeIn" } }
+          in: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] } },
+          out: { opacity: 0, scale: 1.1, transition: { duration: 0.3, ease: [0.4, 0, 0.6, 1] as [number, number, number, number] } }
         };
       default:
         return {
           initial: { opacity: 0, y: 20 },
-          in: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
-          out: { opacity: 0, y: -20, transition: { duration: 0.3, ease: "easeIn" } }
+          in: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] } },
+          out: { opacity: 0, y: -20, transition: { duration: 0.3, ease: [0.4, 0, 0.6, 1] as [number, number, number, number] } }
         };
     }
   };
@@ -180,8 +180,8 @@ export function CarPageLayout({
   children,
   carName,
   carMake,
-  carModel,
-  carYear,
+  _carModel,
+  _carYear,
   carSlug,
   className = '',
   pageKey = 'car'

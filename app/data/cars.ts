@@ -21,6 +21,14 @@ export interface Car {
   }[];
   condition: string;
   category: string;
+  status: string;
+  featured: boolean;
+  images: {
+    url: string;
+    altText: string;
+    order: number;
+    isPrimary: boolean;
+  }[];
 }
 
 export const cars: Car[] = [
@@ -69,7 +77,17 @@ export const cars: Car[] = [
       { label: 'Seuraava katsastus', value: 'Tarkistettu' }
     ],
     condition: 'Hyvä kunto, säännöllisesti huollettu. Katsastettu ja valmis toimitukseen.',
-    category: 'premium'
+    category: 'premium',
+    status: 'available',
+    featured: false,
+    images: [
+      {
+        url: '/cars/OrderTitle-5.webp',
+        altText: 'BMW 318 2017',
+        order: 1,
+        isPrimary: true
+      }
+    ]
   },
   {
     id: 'skoda-octavia-tdi-2018',
@@ -116,7 +134,17 @@ export const cars: Car[] = [
       { label: 'Omaisuus', value: 'Puhdas' }
     ],
     condition: 'Erinomainen kunto. Säännöllisesti huollettu, huoltokirja tallella.',
-    category: 'family'
+    category: 'family',
+    status: 'available',
+    featured: false,
+    images: [
+      {
+        url: '/cars/OrderTitle3.webp',
+        altText: 'Skoda Octavia 2.0 TDI 2018',
+        order: 1,
+        isPrimary: true
+      }
+    ]
   },
   {
     id: 'skoda-octavia-combi-2015',
@@ -163,7 +191,17 @@ export const cars: Car[] = [
       { label: 'Omaisuus', value: 'Puhdas' }
     ],
     condition: 'Hyvä kunto ikään ja kilometreihin nähden. Säännöllisesti huollettu.',
-    category: 'family'
+    category: 'family',
+    status: 'available',
+    featured: false,
+    images: [
+      {
+        url: '/cars/OrderTitle1.webp',
+        altText: 'Skoda Octavia Combi 2015',
+        order: 1,
+        isPrimary: true
+      }
+    ]
   },
   {
     id: 'skoda-superb-4x4-2018',
@@ -214,7 +252,17 @@ export const cars: Car[] = [
       { label: 'Omaisuus', value: 'Puhdas' }
     ],
     condition: 'Erinomainen kunto. Täysi huoltohistoria. Premium-tason auto.',
-    category: 'premium'
+    category: 'premium',
+    status: 'available',
+    featured: true,
+    images: [
+      {
+        url: '/cars/OrderTitle2.webp',
+        altText: 'Skoda Superb 2.0 TDI Style 4x4 2018',
+        order: 1,
+        isPrimary: true
+      }
+    ]
   },
   {
     id: 'skoda-karoq-tdi-2019',
@@ -263,7 +311,17 @@ export const cars: Car[] = [
       { label: 'Omaisuus', value: 'Puhdas' }
     ],
     condition: 'Erinomainen kunto. Säännöllisesti huollettu ja valmis toimitukseen.',
-    category: 'suv'
+    category: 'suv',
+    status: 'available',
+    featured: false,
+    images: [
+      {
+        url: '/cars/OrderTitle4.webp',
+        altText: 'Skoda Karoq 1.6 TDI 2019',
+        order: 1,
+        isPrimary: true
+      }
+    ]
   },
   {
     id: 'mercedes-e220d-2017',
@@ -314,7 +372,17 @@ export const cars: Car[] = [
       { label: 'Omaisuus', value: 'Puhdas' }
     ],
     condition: 'Hyvä kunto. Valtuutettu huoltohistoria. Premium-merkki.',
-    category: 'premium'
+    category: 'premium',
+    status: 'available',
+    featured: true,
+    images: [
+      {
+        url: '/cars/OrderTitle6.webp',
+        altText: 'Mercedes-Benz E220 d A 2017',
+        order: 1,
+        isPrimary: true
+      }
+    ]
   },
   {
     id: 'volkswagen-troc-2019',
@@ -362,7 +430,17 @@ export const cars: Car[] = [
       { label: 'Omaisuus', value: 'Puhdas' }
     ],
     condition: 'Erinomainen kunto. Säännöllisesti huollettu. Siisti ja hyvin pidetty.',
-    category: 'suv'
+    category: 'suv',
+    status: 'available',
+    featured: false,
+    images: [
+      {
+        url: '/cars/OrderTitle7.webp',
+        altText: 'Volkswagen T-Roc 2019',
+        order: 1,
+        isPrimary: true
+      }
+    ]
   },
   {
     id: 'volkswagen-tiguan-2020',
@@ -413,7 +491,17 @@ export const cars: Car[] = [
       { label: 'Omaisuus', value: 'Puhdas' }
     ],
     condition: 'Lähes uudenveroisessa kunnossa. Täysi huoltohistoria. Takuu voimassa.',
-    category: 'suv'
+    category: 'suv',
+    status: 'available',
+    featured: false,
+    images: [
+      {
+        url: '/cars/OrderTitle8.webp',
+        altText: 'Volkswagen Tiguan 2020',
+        order: 1,
+        isPrimary: true
+      }
+    ]
   },
   {
     id: 'audi-q3-tdi-2018',
@@ -466,7 +554,17 @@ export const cars: Car[] = [
       { label: 'Omaisuus', value: 'Puhdas' }
     ],
     condition: 'Erinomainen kunto. Valtuutettu huoltohistoria. Premium-tason auto.',
-    category: 'premium'
+    category: 'premium',
+    status: 'available',
+    featured: true,
+    images: [
+      {
+        url: '/cars/OrderTitle9.webp',
+        altText: 'Audi Q3 2.0 TDI 2018',
+        order: 1,
+        isPrimary: true
+      }
+    ]
   }
 ];
 

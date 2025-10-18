@@ -1,7 +1,14 @@
 // Core utilities
 export * from './utils';
 export * from './validation';
-export * from './error-handler';
+export {
+  AppError,
+  ValidationError,
+  NotFoundError,
+  UnauthorizedError,
+  handleError,
+  isAppError
+} from './error-handler';
 export * from './error-utils';
 export * from './logger';
 export * from './env';

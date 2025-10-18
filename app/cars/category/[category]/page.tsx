@@ -74,7 +74,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
   // Validate category
   const validCategories = Object.values(CarCategory);
-  if (!validCategories.includes(category as any)) {
+  if (!validCategories.includes(category as typeof CarCategory[keyof typeof CarCategory])) {
     notFound();
   }
 

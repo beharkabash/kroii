@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { MessageCircle, X, Phone, Clock, MapPin, Send, User, Sparkles } from 'lucide-react';
+import { MessageCircle, X, Phone, Clock, MapPin, Send, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/app/lib/core/utils';
 

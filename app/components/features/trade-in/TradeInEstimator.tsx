@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Car, Calculator, Zap, Clock, FileText, Phone, MessageCircle, CheckCircle, AlertCircle, TrendingUp, TrendingDown, Star, Award, Sparkles, Camera } from 'lucide-react';
+import { Car, Calculator, Zap, Clock, FileText, Phone, MessageCircle, CheckCircle, AlertCircle, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import confetti from 'canvas-confetti';
 import { Input } from '@/app/components/ui/forms/Input';
@@ -40,7 +40,6 @@ export default function TradeInEstimator({
   const [isCalculating, setIsCalculating] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [showSuccess, setShowSuccess] = useState(false);
-  const [currentStep, setCurrentStep] = useState(1);
 
   // Extract car makes from actual car data
   const carMakes = useMemo(() => {

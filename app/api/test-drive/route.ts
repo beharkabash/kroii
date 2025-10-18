@@ -3,6 +3,14 @@ import { z } from 'zod';
 import { createClient } from '@sanity/client';
 import { Resend } from 'resend';
 
+// Type for Sanity booking document
+interface SanityBooking {
+  _id: string;
+  preferredTime: string;
+  scheduledDate: string;
+  [key: string]: unknown;
+}
+
 // Initialize Sanity client
 const sanityClient = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
@@ -228,7 +236,7 @@ export async function GET(request: NextRequest) {
     );
 
     // Count bookings per time slot
-    const slotCounts = bookings.reduce((acc: Record<string, number>, booking: any) => {
+    const slotCounts = bookings.reduce((acc: Record<string, number>, booking: SanityBooking) => {
       acc[booking.preferredTime] = (acc[booking.preferredTime] || 0) + 1;
       return acc;
     }, {});

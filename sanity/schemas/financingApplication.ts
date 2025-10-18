@@ -1,4 +1,6 @@
-export default {
+import { SanityRule } from './types';
+
+const financingApplicationSchema = {
   name: 'financingApplication',
   title: 'Financing Applications',
   type: 'document',
@@ -12,25 +14,25 @@ export default {
           name: 'firstName',
           title: 'First Name',
           type: 'string',
-          validation: (Rule: any) => Rule.required()
+          validation: (Rule: SanityRule) => Rule.required()
         },
         {
           name: 'lastName',
           title: 'Last Name',
           type: 'string',
-          validation: (Rule: any) => Rule.required()
+          validation: (Rule: SanityRule) => Rule.required()
         },
         {
           name: 'email',
           title: 'Email',
           type: 'string',
-          validation: (Rule: any) => Rule.required().email()
+          validation: (Rule: SanityRule) => Rule.required().email()
         },
         {
           name: 'phone',
           title: 'Phone',
           type: 'string',
-          validation: (Rule: any) => Rule.required()
+          validation: (Rule: SanityRule) => Rule.required()
         },
         {
           name: 'ssn',
@@ -128,25 +130,25 @@ export default {
           name: 'vehiclePrice',
           title: 'Vehicle Price (€)',
           type: 'number',
-          validation: (Rule: any) => Rule.required()
+          validation: (Rule: SanityRule) => Rule.required()
         },
         {
           name: 'downPayment',
           title: 'Down Payment (€)',
           type: 'number',
-          validation: (Rule: any) => Rule.required()
+          validation: (Rule: SanityRule) => Rule.required()
         },
         {
           name: 'loanAmount',
           title: 'Loan Amount (€)',
           type: 'number',
-          validation: (Rule: any) => Rule.required()
+          validation: (Rule: SanityRule) => Rule.required()
         },
         {
           name: 'loanTerm',
           title: 'Loan Term (months)',
           type: 'number',
-          validation: (Rule: any) => Rule.required()
+          validation: (Rule: SanityRule) => Rule.required()
         },
         {
           name: 'preferredMonthlyPayment',
@@ -242,13 +244,13 @@ export default {
       name: 'gdprConsent',
       title: 'GDPR Consent',
       type: 'boolean',
-      validation: (Rule: any) => Rule.required()
+      validation: (Rule: SanityRule) => Rule.required()
     },
     {
       name: 'creditCheckConsent',
       title: 'Credit Check Consent',
       type: 'boolean',
-      validation: (Rule: any) => Rule.required()
+      validation: (Rule: SanityRule) => Rule.required()
     }
   ],
   preview: {
@@ -257,11 +259,13 @@ export default {
       subtitle: 'loanDetails.loanAmount',
       status: 'status'
     },
-    prepare({ title, subtitle, status }: any) {
+    prepare({ title, subtitle, status }: { title: string; subtitle: string; status: string }) {
       return {
         title: `${title}`,
         subtitle: `€${subtitle} - ${status}`
       }
     }
   }
-}
+};
+
+export default financingApplicationSchema;

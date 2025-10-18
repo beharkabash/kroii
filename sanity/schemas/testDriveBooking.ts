@@ -1,4 +1,6 @@
-export default {
+import { SanityRule } from './types';
+
+const testDriveBookingSchema = {
   name: 'testDriveBooking',
   title: 'Test Drive Bookings',
   type: 'document',
@@ -12,19 +14,19 @@ export default {
           name: 'name',
           title: 'Name',
           type: 'string',
-          validation: (Rule: any) => Rule.required()
+          validation: (Rule: SanityRule) => Rule.required()
         },
         {
           name: 'email',
           title: 'Email',
           type: 'string',
-          validation: (Rule: any) => Rule.required().email()
+          validation: (Rule: SanityRule) => Rule.required().email()
         },
         {
           name: 'phone',
           title: 'Phone',
           type: 'string',
-          validation: (Rule: any) => Rule.required()
+          validation: (Rule: SanityRule) => Rule.required()
         },
         {
           name: 'driversLicense',
@@ -38,13 +40,13 @@ export default {
       title: 'Car',
       type: 'reference',
       to: [{ type: 'car' }],
-      validation: (Rule: any) => Rule.required()
+      validation: (Rule: SanityRule) => Rule.required()
     },
     {
       name: 'scheduledDate',
       title: 'Scheduled Date',
       type: 'datetime',
-      validation: (Rule: any) => Rule.required()
+      validation: (Rule: SanityRule) => Rule.required()
     },
     {
       name: 'preferredTime',
@@ -112,7 +114,7 @@ export default {
       name: 'gdprConsent',
       title: 'GDPR Consent',
       type: 'boolean',
-      validation: (Rule: any) => Rule.required()
+      validation: (Rule: SanityRule) => Rule.required()
     }
   ],
   preview: {
@@ -121,7 +123,7 @@ export default {
       subtitle: 'scheduledDate',
       status: 'status'
     },
-    prepare({ title, subtitle, status }: any) {
+    prepare({ title, subtitle, status }: { title: string; subtitle: string; status: string }) {
       const date = new Date(subtitle).toLocaleDateString('fi-FI');
       return {
         title,
@@ -129,4 +131,6 @@ export default {
       }
     }
   }
-}
+};
+
+export default testDriveBookingSchema;

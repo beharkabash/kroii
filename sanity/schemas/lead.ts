@@ -1,4 +1,6 @@
-export default {
+import { SanityRule } from './types';
+
+const leadSchema = {
   name: 'lead',
   title: 'Leads',
   type: 'document',
@@ -7,19 +9,19 @@ export default {
       name: 'name',
       title: 'Name',
       type: 'string',
-      validation: (Rule: any) => Rule.required()
+      validation: (Rule: SanityRule) => Rule.required()
     },
     {
       name: 'email',
       title: 'Email',
       type: 'string',
-      validation: (Rule: any) => Rule.required().email()
+      validation: (Rule: SanityRule) => Rule.required().email()
     },
     {
       name: 'phone',
       title: 'Phone',
       type: 'string',
-      validation: (Rule: any) => Rule.required()
+      validation: (Rule: SanityRule) => Rule.required()
     },
     {
       name: 'message',
@@ -103,11 +105,13 @@ export default {
       subtitle: 'email',
       status: 'status'
     },
-    prepare({ title, subtitle, status }: any) {
+    prepare({ title, subtitle, status }: { title: string; subtitle: string; status: string }) {
       return {
         title,
         subtitle: `${subtitle} - ${status}`
       }
     }
   }
-}
+};
+
+export default leadSchema;

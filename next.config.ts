@@ -59,7 +59,6 @@ const nextConfig: NextConfig = {
   // Performance optimizations
   compress: true,
   poweredByHeader: false,
-  swcMinify: true,
 
   // Modern JavaScript output
   // output: "standalone", // Temporarily disabled for Render compatibility

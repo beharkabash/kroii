@@ -59,7 +59,7 @@ const nextConfig: NextConfig = {
   // Performance optimizations
   compress: true,
   poweredByHeader: false,
-  swcMinify: true,
+  // Note: swcMinify is enabled by default in Next.js 15+
 
   // Modern JavaScript output
   // output: "standalone", // Temporarily disabled for Render compatibility

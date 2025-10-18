@@ -316,7 +316,7 @@ export const cars: Car[] = [
     featured: false,
     images: [
       {
-        url: '/cars/OrderTitle4.webp',
+        url: '/cars/OrderTitle-5.webp',
         altText: 'Skoda Karoq 1.6 TDI 2019',
         order: 1,
         isPrimary: true
@@ -435,7 +435,7 @@ export const cars: Car[] = [
     featured: false,
     images: [
       {
-        url: '/cars/OrderTitle7.webp',
+        url: '/cars/OrderTitle-7-3.webp',
         altText: 'Volkswagen T-Roc 2019',
         order: 1,
         isPrimary: true
@@ -496,7 +496,7 @@ export const cars: Car[] = [
     featured: false,
     images: [
       {
-        url: '/cars/OrderTitle8.webp',
+        url: '/cars/OrderTitle1.webp',
         altText: 'Volkswagen Tiguan 2020',
         order: 1,
         isPrimary: true
@@ -559,7 +559,7 @@ export const cars: Car[] = [
     featured: true,
     images: [
       {
-        url: '/cars/OrderTitle9.webp',
+        url: '/cars/OrderTitle2.webp',
         altText: 'Audi Q3 2.0 TDI 2018',
         order: 1,
         isPrimary: true

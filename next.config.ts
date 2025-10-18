@@ -52,11 +52,14 @@ const nextConfig: NextConfig = {
             exclude: ["error", "warn"],
           }
         : false,
+    // Optimize styled-components
+    styledComponents: true,
   },
 
   // Performance optimizations
   compress: true,
   poweredByHeader: false,
+  swcMinify: true,
 
   // Modern JavaScript output
   // output: "standalone", // Temporarily disabled for Render compatibility
@@ -69,8 +72,15 @@ const nextConfig: NextConfig = {
     return "kroi-auto-build-" + Date.now();
   },
 
-  // Experimental features - none enabled for stability
-  experimental: {},
+  // Experimental features for better performance
+  experimental: {
+    optimizePackageImports: [
+      'lucide-react',
+      'framer-motion',
+    ],
+    // Reduce memory usage during build
+    webpackBuildWorker: true,
+  },
 
   // Disable problematic features during build
   trailingSlash: false,

@@ -94,6 +94,12 @@ export type {
 } from './feedback';
 
 // =============================================================================
+// LAZY COMPONENTS
+// =============================================================================
+export { default as LazyFinancingCalculator } from './LazyFinancingCalculator';
+export { default as LazyTradeInEstimator } from './LazyTradeInEstimator';
+
+// =============================================================================
 // THEME CONFIGURATION
 // =============================================================================
 

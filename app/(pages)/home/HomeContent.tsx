@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { getPlaceholder } from '../../lib/features/image-placeholder';
 import Testimonials from '../../components/features/testimonials/Testimonials';
-import FinancingCalculator from '../../components/features/financing/FinancingCalculator';
+import LazyFinancingCalculator from '../../components/ui/LazyFinancingCalculator';
 
 import type { Car } from '@/app/data/cars';
 
@@ -433,7 +433,7 @@ export default function HomeContent({ cars }: HomeContentProps) {
 
       <Testimonials limit={6} showTitle={true} />
 
-      <FinancingCalculator className="py-16 bg-slate-50" />
+      <LazyFinancingCalculator variant="inline" className="py-16 bg-slate-50" />
 
       <section id="contact" className="py-20 bg-slate-900 text-white relative overflow-hidden">
         {/* Background Pattern */}

@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, CreditCard, CheckCircle, Calculator, FileText, Users, Shield } from 'lucide-react';
-import { FinancingCalculator } from '../components/features/financing';
+import LazyFinancingCalculator from '../components/ui/LazyFinancingCalculator';
 
 export const metadata: Metadata = {
   title: 'Autorahoitus | Kroi Auto Center',
@@ -195,7 +195,7 @@ export default function FinancingPage() {
       </section>
 
       {/* Financing Calculator */}
-      <FinancingCalculator className="py-16 bg-white" />
+      <LazyFinancingCalculator variant="inline" className="py-16 bg-white" />
 
       {/* Required Documents Section */}
       <section className="py-16 bg-slate-50">

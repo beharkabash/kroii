@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, Car, CheckCircle, Clock, Euro, FileText, Zap } from 'lucide-react';
-import { TradeInEstimator } from '../components/features/trade-in';
+import LazyTradeInEstimator from '../components/ui/LazyTradeInEstimator';
 
 export const metadata: Metadata = {
   title: 'Vaihtoauton arviointi | Kroi Auto Center',
@@ -121,7 +121,7 @@ export default function TradeInPage() {
 
       {/* Calculator Section */}
       <div id="calculator">
-        <TradeInEstimator className="py-16 bg-slate-50" />
+        <LazyTradeInEstimator variant="inline" className="py-16 bg-slate-50" />
       </div>
 
       {/* How It Works Section */}

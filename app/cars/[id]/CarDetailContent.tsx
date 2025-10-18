@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { getPlaceholder } from '@/app/lib/features/image-placeholder';
 import { Testimonials } from '@/app/components/features/testimonials';
-import { FinancingCalculator } from '@/app/components/features/financing';
+import LazyFinancingCalculator from '@/app/components/ui/LazyFinancingCalculator';
 import { TestDriveScheduler } from '@/app/components/features/cars';
 
 interface CarImage {
@@ -364,7 +364,8 @@ export function CarDetailContent({ car, relatedCars }: CarDetailContentProps) {
       <Testimonials vehicleId={car.id} limit={3} showTitle={true} className="py-16 bg-slate-50" />
 
       {/* Financing Calculator */}
-      <FinancingCalculator
+      <LazyFinancingCalculator
+        variant="inline"
         vehiclePrice={car.priceEur}
         vehicleName={car.name}
         className="py-16 bg-white"

@@ -1,0 +1,47 @@
+services:
+  - type: web
+    name: kroii-auto-center
+    runtime: node
+    nodeVersion: 20.18.1  # Matches .nvmrc
+    region: frankfurt  # Change to your preferred region: oregon, frankfurt, singapore, etc.
+    plan: starter  # Options: free, starter, standard, pro
+    branch: main
+    buildCommand: cd kroi-auto-center && npm install && npm run build
+    startCommand: cd kroi-auto-center/.next/standalone/kroi-auto-center && node server.js
+    healthCheckPath: /api/health
+    
+    envVars:
+      - key: NODE_ENV
+        value: production
+      
+      - key: NODE_OPTIONS
+        value: --max-old-space-size=768  # Use 384 for free tier (512MB)
+      
+      - key: NEXTAUTH_SECRET
+        generateValue: true  # Render will auto-generate this
+      
+      - key: NEXTAUTH_URL
+        value: https://kroii-auto-center.onrender.com  # Update with your actual Render URL
+      
+      # Optional: Sanity CMS (uncomment if using)
+      # - key: NEXT_PUBLIC_SANITY_PROJECT_ID
+      #   sync: false
+      
+      # - key: NEXT_PUBLIC_SANITY_DATASET
+      #   value: production
+      
+      # - key: SANITY_API_TOKEN
+      #   sync: false
+      
+      # Optional: Email service (uncomment if using)
+      # - key: RESEND_API_KEY
+      #   sync: false
+    
+    # Auto-deploy on push to main branch
+    autoDeploy: true
+    
+    # Disk storage (if needed for uploads)
+    # disk:
+    #   name: uploads
+    #   mountPath: /var/data
+    #   sizeGB: 1

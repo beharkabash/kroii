@@ -10,13 +10,12 @@ services:
     buildCommand: |
       npm install --include=dev
       npm run build
-      # Copy public and static assets beside the standalone folder
-      cp -r .next/static .next/standalone/.next/
-      cp -r public .next/standalone/public
+      mkdir -p .next/standalone/public
+      mkdir -p .next/standalone/.next/static
+      cp -r public/* .next/standalone/public/
+      cp -r .next/static/* .next/standalone/.next/static/
 
     startCommand: node .next/standalone/server.js
-
-    healthCheckPath: /api/health
 
     envVars:
       - key: NODE_ENV
@@ -26,6 +25,6 @@ services:
       - key: NEXTAUTH_SECRET
         generateValue: true
       - key: NEXTAUTH_URL
-        value: https://kroii-auto-center.onrender.com
+        value: https://kroii.onrender.com
 
     autoDeploy: true

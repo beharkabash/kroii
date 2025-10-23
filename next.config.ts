@@ -17,11 +17,6 @@ if (process.env.ANALYZE === "true") {
 const pwa = (config: NextConfig) => config;
 
 const nextConfig: NextConfig = {
-  // Enable standalone output for optimized production builds
-  output: 'standalone',
-  
-  // Set the correct workspace root to avoid lockfile warnings
-  outputFileTracingRoot: require('path').join(__dirname),
 
   eslint: {
     ignoreDuringBuilds: true,

@@ -6,8 +6,8 @@ services:
     region: frankfurt  # Change to your preferred region: oregon, frankfurt, singapore, etc.
     plan: starter  # Options: free, starter, standard, pro
     branch: main
-    buildCommand: cd kroi-auto-center && npm install && npm run build
-    startCommand: cd kroi-auto-center/.next/standalone/kroi-auto-center && node server.js
+    buildCommand: npm install && npm run build
+    startCommand: node .next/standalone/kroi-auto-center/server.js
     healthCheckPath: /api/health
     
     envVars:

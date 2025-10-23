@@ -7,7 +7,7 @@ services:
     plan: starter  # Options: free, starter, standard, pro
     branch: main
     buildCommand: npm install --include=dev && npm run build
-    startCommand: node .next/standalone/kroi-auto-center/server.js
+    startCommand: cd .next/standalone/kroi-auto-center && node server.js
     healthCheckPath: /api/health
     
     envVars:

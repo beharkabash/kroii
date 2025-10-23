@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ComparisonWidget } from "./components/features/comparison";
 import { WhatsAppChat } from "./components/integrations/chat";
 import { SEOGenerator } from "./lib/features/seo-utils";
 
@@ -84,7 +83,6 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
-        <ComparisonWidget />
         <WhatsAppChat />
         {children}
       </body>

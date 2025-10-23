@@ -36,6 +36,7 @@ export default function AdvancedFinancingCalculator({
   const [interestRate, setInterestRate] = useState(4.5);
   const [loanTerm, setLoanTerm] = useState(60);
   const [activeTab, setActiveTab] = useState<'calculator' | 'comparison' | 'schedule'>('calculator');
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   // Validation
   const validateInputs = useCallback(() => {

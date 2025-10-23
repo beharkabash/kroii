@@ -1,19 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { createClient } from '@sanity/client';
 import { Resend } from 'resend';
 
-// Initialize Sanity client
-const sanityClient = createClient({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
-  token: process.env.SANITY_API_TOKEN,
-  useCdn: false,
-  apiVersion: '2024-01-01'
-});
+// Check if Resend is configured
+const RESEND_ENABLED = process.env.RESEND_API_KEY && 
+                       process.env.RESEND_API_KEY !== 'your_resend_api_key_here';
 
-// Initialize Resend
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend only if configured
+const resend = RESEND_ENABLED ? new Resend(process.env.RESEND_API_KEY) : null;
 
 // Validation schema
 const contactSchema = z.object({
@@ -73,26 +67,15 @@ export async function POST(request: NextRequest) {
 
     const data = validationResult.data;
 
-    // Save to Sanity
-    const lead = await sanityClient.create({
-      _type: 'lead',
+    // Log submission (replace Sanity with simple logging or database later)
+    console.log('Contact form submission:', {
       name: data.name,
       email: data.email,
-      phone: data.phone,
-      message: data.message,
-      source: 'contact',
-      status: 'new',
-      carInterest: data.carInterest ? {
-        _type: 'reference',
-        _ref: data.carInterest
-      } : undefined,
-      gdprConsent: data.gdprConsent,
-      marketingConsent: data.marketingConsent || false,
-      createdAt: new Date().toISOString()
+      timestamp: new Date().toISOString()
     });
 
-    // Send email notification to admin
-    if (process.env.RESEND_API_KEY && process.env.CONTACT_EMAIL) {
+    // Send email notification to admin (if configured)
+    if (resend && process.env.CONTACT_EMAIL) {
       try {
         await resend.emails.send({
           from: process.env.FROM_EMAIL || 'noreply@kroiautocenter.fi',
@@ -134,8 +117,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Contact form submitted successfully',
-      leadId: lead._id
+      message: 'Contact form submitted successfully'
     });
 
   } catch (error) {

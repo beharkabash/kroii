@@ -20,8 +20,8 @@ const nextConfig: NextConfig = {
   // Optimize images with advanced settings
   images: {
     formats: ["image/avif", "image/webp"],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    deviceSizes: [640, 828, 1200, 1920], // Reduced from 6 to 4 sizes
+    imageSizes: [16, 32, 48, 64, 96, 128], // Reduced from 8 to 6 sizes
     minimumCacheTTL: 60 * 60 * 24 * 365, // 1 year cache
     dangerouslyAllowSVG: false,
     contentDispositionType: "attachment",
@@ -60,8 +60,8 @@ const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
 
-  // Modern JavaScript output
-  // output: "standalone", // Temporarily disabled for Render compatibility
+  // Modern JavaScript output - enabled for smaller runtime
+  output: "standalone",
 
   // Increase timeout for static generation
   staticPageGenerationTimeout: 120,
@@ -75,7 +75,6 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: [
       'lucide-react',
-      'framer-motion',
     ],
     // Reduce memory usage during build
     webpackBuildWorker: true,

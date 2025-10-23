@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Car } from 'lucide-react';
 
 // Lazy load the TradeInEstimator only when user requests it
-const TradeInEstimator = dynamic(() => import('../features/trade-in/TradeInEstimator'), {
+const TradeInEstimator = dynamic(() => import('../features/trade-in/TradeInEstimatorLite'), {
   ssr: false,
   loading: () => (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -22,23 +22,18 @@ const TradeInEstimator = dynamic(() => import('../features/trade-in/TradeInEstim
 interface LazyTradeInEstimatorProps {
   variant?: 'button' | 'inline';
   className?: string;
-  compact?: boolean;
 }
 
 export default function LazyTradeInEstimator({
   variant = 'button',
   className = '',
-  compact
 }: LazyTradeInEstimatorProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   // Inline variant renders the component directly (for pages like /trade-in)
   if (variant === 'inline') {
     return (
-      <TradeInEstimator
-        className={className}
-        compact={compact}
-      />
+      <TradeInEstimator />
     );
   }
 
@@ -58,8 +53,6 @@ export default function LazyTradeInEstimator({
 
   // Load the actual component when requested
   return (
-    <TradeInEstimator
-      compact={compact}
-    />
+    <TradeInEstimator />
   );
 }

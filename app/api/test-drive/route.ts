@@ -1,27 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { createClient } from '@sanity/client';
 import { Resend } from 'resend';
 
-// Type for Sanity booking document
-interface SanityBooking {
+// Type for booking document
+interface Booking {
   _id: string;
   preferredTime: string;
   scheduledDate: string;
   [key: string]: unknown;
 }
 
-// Initialize Sanity client
-const sanityClient = createClient({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
-  token: process.env.SANITY_API_TOKEN,
-  useCdn: false,
-  apiVersion: '2024-01-01'
-});
+// Check if Resend is configured
+const RESEND_ENABLED = process.env.RESEND_API_KEY && 
+                       process.env.RESEND_API_KEY !== 'your_resend_api_key_here';
 
-// Initialize Resend
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend only if configured
+const resend = RESEND_ENABLED ? new Resend(process.env.RESEND_API_KEY) : null;
 
 // Validation schema
 const testDriveSchema = z.object({
@@ -83,57 +77,22 @@ export async function POST(request: NextRequest) {
 
     const data = validationResult.data;
 
-    // Check if the slot is available (simple check - could be enhanced)
-    const existingBookings = await sanityClient.fetch(
-      `*[_type == "testDriveBooking" &&
-        scheduledDate == $date &&
-        preferredTime == $time &&
-        status in ["pending", "confirmed"]]`,
-      {
-        date: data.scheduledDate.toISOString(),
-        time: data.preferredTime
-      }
-    );
-
-    if (existingBookings.length >= 2) { // Max 2 bookings per time slot
-      return NextResponse.json(
-        { error: 'This time slot is no longer available. Please choose another time.' },
-        { status: 409 }
-      );
-    }
-
-    // Save to Sanity
-    const booking = await sanityClient.create({
+    // Create booking object (without database - logged for now)
+    const booking = {
+      _id: `booking_${Date.now()}`,
       _type: 'testDriveBooking',
       customer: data.customer,
-      car: {
-        _type: 'reference',
-        _ref: data.carId
-      },
+      carId: data.carId,
       scheduledDate: data.scheduledDate.toISOString(),
       preferredTime: data.preferredTime,
       status: 'pending',
       notes: data.notes,
       gdprConsent: data.gdprConsent,
       createdAt: new Date().toISOString()
-    });
+    };
 
-    // Also create a lead for follow-up
-    await sanityClient.create({
-      _type: 'lead',
-      name: data.customer.name,
-      email: data.customer.email,
-      phone: data.customer.phone,
-      message: `Test drive booking for ${data.scheduledDate.toLocaleDateString('fi-FI')} - ${data.preferredTime}`,
-      source: 'test-drive',
-      status: 'new',
-      carInterest: {
-        _type: 'reference',
-        _ref: data.carId
-      },
-      gdprConsent: data.gdprConsent,
-      createdAt: new Date().toISOString()
-    });
+    // Log booking (replace with database save in production)
+    console.log('Test Drive Booking:', JSON.stringify(booking, null, 2));
 
     // Send email notifications
     if (process.env.RESEND_API_KEY) {
@@ -145,7 +104,7 @@ export async function POST(request: NextRequest) {
 
       try {
         // Email to admin
-        await resend.emails.send({
+        await resend!.emails.send({
           from: process.env.FROM_EMAIL || 'noreply@kroiautocenter.fi',
           to: process.env.CONTACT_EMAIL || 'kroiautocenter@gmail.com',
           subject: `New Test Drive Booking - ${data.customer.name}`,
@@ -162,7 +121,7 @@ export async function POST(request: NextRequest) {
         });
 
         // Confirmation email to customer
-        await resend.emails.send({
+        await resend!.emails.send({
           from: process.env.FROM_EMAIL || 'noreply@kroiautocenter.fi',
           to: data.customer.email,
           subject: 'Test Drive Booking Confirmation - Kroi Auto Center',
@@ -221,31 +180,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get existing bookings for the date
-    const bookings = await sanityClient.fetch(
-      `*[_type == "testDriveBooking" &&
-        scheduledDate >= $startDate &&
-        scheduledDate < $endDate &&
-        status in ["pending", "confirmed"]] {
-        preferredTime
-      }`,
-      {
-        startDate: new Date(date).toISOString(),
-        endDate: new Date(new Date(date).getTime() + 24 * 60 * 60 * 1000).toISOString()
-      }
-    );
-
-    // Count bookings per time slot
-    const slotCounts = bookings.reduce((acc: Record<string, number>, booking: SanityBooking) => {
-      acc[booking.preferredTime] = (acc[booking.preferredTime] || 0) + 1;
-      return acc;
-    }, {});
-
-    // Determine available slots (max 2 per slot)
+    // For now, return all slots as available (replace with database check)
     const availableSlots = {
-      morning: slotCounts.morning < 2,
-      afternoon: slotCounts.afternoon < 2,
-      evening: slotCounts.evening < 2
+      morning: true,
+      afternoon: true,
+      evening: true
     };
 
     return NextResponse.json({ availableSlots });

@@ -1,19 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { createClient } from '@sanity/client';
 import { Resend } from 'resend';
 
-// Initialize Sanity client
-const sanityClient = createClient({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
-  token: process.env.SANITY_API_TOKEN,
-  useCdn: false,
-  apiVersion: '2024-01-01'
-});
+// Check if Resend is configured
+const RESEND_ENABLED = process.env.RESEND_API_KEY && 
+                       process.env.RESEND_API_KEY !== 'your_resend_api_key_here';
 
-// Initialize Resend
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend only if configured
+const resend = RESEND_ENABLED ? new Resend(process.env.RESEND_API_KEY) : null;
 
 // Validation schema
 const financingSchema = z.object({
@@ -118,43 +112,25 @@ export async function POST(request: NextRequest) {
       data.loanDetails.loanTerm
     );
 
-    // Save to Sanity
-    const application = await sanityClient.create({
+    // Create application object (without database - logged for now)
+    const application = {
+      _id: `financing_${Date.now()}`,
       _type: 'financingApplication',
       applicant: data.applicant,
       employment: data.employment,
-      loanDetails: {
-        ...data.loanDetails,
-        car: data.loanDetails.carId ? {
-          _type: 'reference',
-          _ref: data.loanDetails.carId
-        } : undefined
-      },
+      loanDetails: data.loanDetails,
       status: 'submitted',
       gdprConsent: data.gdprConsent,
       creditCheckConsent: data.creditCheckConsent,
+      estimatedMonthlyPayment: estimatedPayment,
       createdAt: new Date().toISOString()
-    });
+    };
 
-    // Also create a lead for follow-up
-    await sanityClient.create({
-      _type: 'lead',
-      name: `${data.applicant.firstName} ${data.applicant.lastName}`,
-      email: data.applicant.email,
-      phone: data.applicant.phone,
-      message: `Financing application for €${data.loanDetails.loanAmount} over ${data.loanDetails.loanTerm} months`,
-      source: 'financing',
-      status: 'new',
-      carInterest: data.loanDetails.carId ? {
-        _type: 'reference',
-        _ref: data.loanDetails.carId
-      } : undefined,
-      gdprConsent: data.gdprConsent,
-      createdAt: new Date().toISOString()
-    });
+    // Log application (replace with database save in production)
+    console.log('Financing Application:', JSON.stringify(application, null, 2));
 
     // Send email notifications
-    if (process.env.RESEND_API_KEY) {
+    if (process.env.RESEND_API_KEY && resend) {
       try {
         // Email to admin with application details
         await resend.emails.send({
@@ -187,7 +163,7 @@ export async function POST(request: NextRequest) {
         });
 
         // Confirmation email to applicant
-        await resend.emails.send({
+        await resend!.emails.send({
           from: process.env.FROM_EMAIL || 'noreply@kroiautocenter.fi',
           to: data.applicant.email,
           subject: 'Financing Application Received - Kroi Auto Center',

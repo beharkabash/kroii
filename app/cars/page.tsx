@@ -20,21 +20,13 @@ import {
   ArrowUpDown
 } from 'lucide-react';
 import { cn } from '../lib/core/utils';
-import { cars } from '../data/cars';
+import type { Car } from '../data/cars';
 
 // Animation variants
 const fadeInUp = {
   initial: { opacity: 0, y: 60 },
   animate: { opacity: 1, y: 0 },
   exit: { opacity: 0, y: -60 }
-};
-
-const staggerContainer = {
-  animate: {
-    transition: {
-      staggerChildren: 0.1
-    }
-  }
 };
 
 // Filter options
@@ -82,11 +74,56 @@ export default function AllCarsPage() {
   const router = useRouter();
   const pathname = usePathname();
 
+  // Load cars dynamically
+  const [cars, setCars] = useState<Car[]>([]);
+  const [carsLoading, setCarsLoading] = useState(true);
+
+  useEffect(() => {
+    console.log('🚗 Starting to load cars...');
+    fetch('/api/cars')
+      .then(res => res.json())
+      .then(data => {
+        console.log('📡 API Response:', data);
+        if (data.success && data.cars && data.cars.length > 0) {
+          console.log('✅ Loading dynamic cars:', data.cars.length);
+          setCars(data.cars);
+        } else {
+          console.log('⚠️ No dynamic cars, falling back to static');
+          // Fallback to static import if needed
+          import('../data/cars').then(module => {
+            console.log('✅ Static cars loaded:', module.cars.length);
+            setCars(module.cars);
+          });
+        }
+      })
+      .catch((error) => {
+        console.error('❌ API Error:', error);
+        // Fallback to static import on error
+        import('../data/cars').then(module => {
+          console.log('✅ Static cars loaded (error fallback):', module.cars.length);
+          setCars(module.cars);
+        });
+      })
+      .finally(() => {
+        console.log('🏁 Cars loading complete');
+        setCarsLoading(false);
+      });
+  }, []);
+
   // State
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
+
+  // Animation variant
+  const staggerContainer = {
+    animate: {
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
 
   // Initialize filters from URL
   const [activeFilters, setActiveFilters] = useState<ActiveFilters>({
@@ -218,13 +255,22 @@ export default function AllCarsPage() {
       activeFilters.priceRange ||
       activeFilters.yearRange;
 
+    console.log('🔍 Filter results:', {
+      totalCars: total,
+      pages,
+      currentPage,
+      pageSize,
+      paginatedCount: paginated.length,
+      hasActiveFilters
+    });
+
     return {
       filteredCars: paginated,
       totalPages: pages,
       totalCars: total,
       isFiltered: hasActiveFilters
     };
-  }, [activeFilters, currentPage, pageSize, currentSort]);
+  }, [activeFilters, currentPage, pageSize, currentSort, cars.length]);
 
   // Handle search
   const handleSearch = useCallback((value: string) => {
@@ -294,11 +340,18 @@ export default function AllCarsPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
-  // Initialize loading state
+  // Initialize loading state - wait for cars to load
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 100);
-    return () => clearTimeout(timer);
-  }, []);
+    console.log('🔄 carsLoading changed to:', carsLoading);
+    if (!carsLoading) {
+      console.log('⏰ Setting isLoading to false in 100ms...');
+      const timer = setTimeout(() => {
+        console.log('✨ isLoading set to false, cars count:', cars.length);
+        setIsLoading(false);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [carsLoading, cars.length]);
 
   // Handle scroll for back to top button
   useEffect(() => {
@@ -684,12 +737,12 @@ export default function AllCarsPage() {
                     transition={{ duration: 0.5, delay: index * 0.1 }}
                     className="group"
                   >
-                    <motion.div
-                      className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden h-full"
-                      whileHover={{ y: -5 }}
-                    >
-                      <div className="relative h-48 overflow-hidden">
-                        <Link href={`/cars/${car.slug}`}>
+                    <Link href={`/cars/${car.slug}`} className="block h-full">
+                      <motion.div
+                        className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden h-full"
+                        whileHover={{ y: -5 }}
+                      >
+                        <div className="relative h-48 overflow-hidden">
                           <Image
                             src={car.image || '/placeholder-car.jpg'}
                             alt={car.name}
@@ -697,7 +750,6 @@ export default function AllCarsPage() {
                             className="object-cover group-hover:scale-110 transition-transform duration-500"
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                           />
-                        </Link>
 
                         {/* Price Badge */}
                         <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm px-3 py-1 rounded-full">
@@ -705,41 +757,12 @@ export default function AllCarsPage() {
                             {car.price}
                           </span>
                         </div>
-
-                        {/* Action Buttons */}
-                        <div className="absolute top-4 left-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <motion.button
-                            onClick={(e) => {
-                              e.preventDefault();
-                              toggleFavorite(car.id);
-                            }}
-                            className={cn(
-                              "p-2 rounded-full backdrop-blur-sm transition-colors",
-                              favoriteIds.has(car.id)
-                                ? "bg-red-500 text-white"
-                                : "bg-white/90 text-slate-700 hover:bg-red-50 hover:text-red-500"
-                            )}
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                          >
-                            <Heart className={cn("h-4 w-4", favoriteIds.has(car.id) && "fill-current")} />
-                          </motion.button>
-
-                          <Link
-                            href={`/cars/${car.slug}`}
-                            className="p-2 bg-white/90 backdrop-blur-sm rounded-full text-slate-700 hover:bg-purple-50 hover:text-purple-600 transition-colors"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Link>
-                        </div>
                       </div>
 
                       <div className="p-6">
-                        <Link href={`/cars/${car.slug}`}>
-                          <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-purple-600 transition-colors line-clamp-1">
-                            {car.name}
-                          </h3>
-                        </Link>
+                        <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-purple-600 transition-colors line-clamp-1">
+                          {car.name}
+                        </h3>
 
                         <p className="text-slate-600 text-sm mb-4 line-clamp-2">
                           {car.description}
@@ -761,15 +784,13 @@ export default function AllCarsPage() {
                         </div>
 
                         <div className="pt-4 border-t border-slate-100">
-                          <Link
-                            href={`/cars/${car.slug}`}
-                            className="inline-flex items-center text-purple-600 font-medium hover:text-purple-700 transition-colors group-hover:underline"
-                          >
+                          <span className="inline-flex items-center text-purple-600 font-medium hover:text-purple-700 transition-colors group-hover:underline">
                             Katso lisätietoja →
-                          </Link>
+                          </span>
                         </div>
                       </div>
                     </motion.div>
+                    </Link>
                   </motion.div>
                 ))}
               </motion.div>

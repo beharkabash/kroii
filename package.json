@@ -13,40 +13,31 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@sanity/client": "^7.12.0",
+    "@sanity/client": "^6.29.1",
     "@sanity/image-url": "^1.2.0",
-    "@types/canvas-confetti": "^1.9.0",
-    "canvas-confetti": "^1.9.3",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.22",
     "lucide-react": "^0.544.0",
     "next": "15.5.4",
+    "next-sanity": "^9.12.3",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "redis": "^5.8.2",
     "resend": "^6.1.0",
     "sharp": "^0.34.4",
     "tailwind-merge": "^3.3.1",
-    "zod": "^3.25.76",
-    "zustand": "^5.0.8"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@next/bundle-analyzer": "^15.5.4",
     "@tailwindcss/postcss": "^4",
-    "@types/bcryptjs": "^2.4.6",
-    "@types/multer": "^2.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.5.4",
-    "next-pwa": "^5.6.0",
-    "playwright": "^1.55.1",
     "tailwindcss": "^4",
     "tsx": "^4.20.6",
-    "typescript": "^5",
-    "workbox-webpack-plugin": "^7.3.0",
-    "workbox-window": "^7.3.0"
+    "typescript": "^5"
   }
 }

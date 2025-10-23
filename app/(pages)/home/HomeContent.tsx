@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { getPlaceholder } from '../../lib/features/image-placeholder';
 import Testimonials from '../../components/features/testimonials/Testimonials';
-import LazyFinancingCalculator from '../../components/ui/LazyFinancingCalculator';
+import AdvancedFinancingCalculator from '../../components/features/financing/AdvancedFinancingCalculator';
 
 import type { Car } from '@/app/data/cars';
 
@@ -433,7 +433,43 @@ export default function HomeContent({ cars }: HomeContentProps) {
 
       <Testimonials limit={6} showTitle={true} />
 
-      <LazyFinancingCalculator variant="inline" className="py-16 bg-slate-50" />
+      {/* Financing Calculator Section */}
+      <section id="calculator" className="py-20 bg-gradient-to-b from-white to-slate-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+              Laske rahoitus
+            </h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              Käytä rahoituslaskuria arvioidaksesi kuukausierän ja kokonaiskustannukset. 
+              Saat välittömästi käsityksen rahoitusvaihtoehdoista.
+            </p>
+          </motion.div>
+
+          <AdvancedFinancingCalculator className="max-w-5xl mx-auto" />
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="text-center mt-8"
+          >
+            <Link
+              href="/financing"
+              className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all"
+            >
+              Lisätietoja rahoituksesta →
+            </Link>
+          </motion.div>
+        </div>
+      </section>
 
       <section id="contact" className="py-20 bg-slate-900 text-white relative overflow-hidden">
         {/* Background Pattern */}

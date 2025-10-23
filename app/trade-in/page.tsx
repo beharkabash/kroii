@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, Car, CheckCircle, Clock, Euro, FileText, Zap } from 'lucide-react';
-import LazyTradeInEstimator from '../components/ui/LazyTradeInEstimator';
 
 export const metadata: Metadata = {
   title: 'Vaihtoauton arviointi | Kroi Auto Center',
@@ -119,10 +118,7 @@ export default function TradeInPage() {
         </div>
       </section>
 
-      {/* Calculator Section */}
-      <div id="calculator">
-        <LazyTradeInEstimator variant="inline" className="py-16 bg-slate-50" />
-      </div>
+      {/* Calculator Removed to reduce memory usage */}
 
       {/* How It Works Section */}
       <section className="py-16 bg-white">

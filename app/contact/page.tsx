@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { ArrowLeft, Mail, Phone, MapPin, Clock, Send, MessageCircle, Facebook, Instagram, CheckCircle, Loader2 } from 'lucide-react';
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import confetti from 'canvas-confetti';
 import {
   ContactFormData,
   FormState,
@@ -90,51 +89,6 @@ export default function ContactPage() {
     return () => clearTimeout(timeoutId);
   }, []);
 
-  // Fire confetti animation
-  const fireConfetti = useCallback(() => {
-    const count = 200;
-    const defaults = {
-      origin: { y: 0.7 },
-      zIndex: 9999
-    };
-
-    function fire(particleRatio: number, opts: confetti.Options) {
-      confetti({
-        ...defaults,
-        ...opts,
-        particleCount: Math.floor(count * particleRatio),
-        colors: ['#8b5cf6', '#ec4899', '#f59e0b', '#10b981']
-      });
-    }
-
-    fire(0.25, {
-      spread: 26,
-      startVelocity: 55,
-    });
-
-    fire(0.2, {
-      spread: 60,
-    });
-
-    fire(0.35, {
-      spread: 100,
-      decay: 0.91,
-      scalar: 0.8
-    });
-
-    fire(0.1, {
-      spread: 120,
-      startVelocity: 25,
-      decay: 0.92,
-      scalar: 1.2
-    });
-
-    fire(0.1, {
-      spread: 120,
-      startVelocity: 45,
-    });
-  }, []);
-
   // Get form data from state
   const getFormData = useCallback((): ContactFormData => ({
     name: formState.name.value,
@@ -191,7 +145,7 @@ export default function ContactPage() {
 
       if (response.ok) {
         setFormStatus('success');
-        fireConfetti();
+        // Simple success state - confetti removed to reduce bundle size
 
         // Reset form
         setFormState(initialFormState);
@@ -372,8 +326,8 @@ export default function ContactPage() {
                         formState.name.error && formState.name.touched
                           ? "border-red-300 bg-red-50"
                           : focusedField === 'name'
-                          ? "border-purple-300 bg-purple-50/30"
-                          : "border-slate-300 hover:border-slate-400"
+                            ? "border-purple-300 bg-purple-50/30"
+                            : "border-slate-300 hover:border-slate-400"
                       )}
                       placeholder="Nimesi"
                       aria-describedby={formState.name.error ? "name-error" : undefined}
@@ -425,8 +379,8 @@ export default function ContactPage() {
                         formState.email.error && formState.email.touched
                           ? "border-red-300 bg-red-50"
                           : focusedField === 'email'
-                          ? "border-purple-300 bg-purple-50/30"
-                          : "border-slate-300 hover:border-slate-400"
+                            ? "border-purple-300 bg-purple-50/30"
+                            : "border-slate-300 hover:border-slate-400"
                       )}
                       placeholder="esimerkki@email.com"
                       aria-describedby={formState.email.error ? "email-error" : undefined}
@@ -478,8 +432,8 @@ export default function ContactPage() {
                         formState.phone.error && formState.phone.touched
                           ? "border-red-300 bg-red-50"
                           : focusedField === 'phone'
-                          ? "border-purple-300 bg-purple-50/30"
-                          : "border-slate-300 hover:border-slate-400"
+                            ? "border-purple-300 bg-purple-50/30"
+                            : "border-slate-300 hover:border-slate-400"
                       )}
                       placeholder="+358 40 123 4567"
                       aria-describedby={formState.phone.error ? "phone-error" : undefined}
@@ -531,8 +485,8 @@ export default function ContactPage() {
                         formState.message.error && formState.message.touched
                           ? "border-red-300 bg-red-50"
                           : focusedField === 'message'
-                          ? "border-purple-300 bg-purple-50/30"
-                          : "border-slate-300 hover:border-slate-400"
+                            ? "border-purple-300 bg-purple-50/30"
+                            : "border-slate-300 hover:border-slate-400"
                       )}
                       placeholder="Kerro meille, miten voimme auttaa sinua..."
                       aria-describedby={formState.message.error ? "message-error" : undefined}

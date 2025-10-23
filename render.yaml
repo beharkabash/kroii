@@ -2,46 +2,30 @@ services:
   - type: web
     name: kroii-auto-center
     runtime: node
-    nodeVersion: 20.18.1  # Matches .nvmrc
-    region: frankfurt  # Change to your preferred region: oregon, frankfurt, singapore, etc.
-    plan: starter  # Options: free, starter, standard, pro
+    nodeVersion: 20.18.1
+    region: frankfurt
+    plan: starter
     branch: main
-    buildCommand: npm install --include=dev && npm run build && cp -r public .next/standalone/kroi-auto-center/ && cp -r .next/static .next/standalone/kroi-auto-center/.next/
-    startCommand: cd .next/standalone/kroi-auto-center && node server.js
+
+    buildCommand: |
+      npm install --include=dev
+      npm run build
+      # Copy public and static assets beside the standalone folder
+      cp -r .next/static .next/standalone/.next/
+      cp -r public .next/standalone/public
+
+    startCommand: node .next/standalone/server.js
+
     healthCheckPath: /api/health
-    
+
     envVars:
       - key: NODE_ENV
         value: production
-      
       - key: NODE_OPTIONS
-        value: --max-old-space-size=768  # Use 384 for free tier (512MB)
-      
+        value: --max-old-space-size=768
       - key: NEXTAUTH_SECRET
-        generateValue: true  # Render will auto-generate this
-      
+        generateValue: true
       - key: NEXTAUTH_URL
-        value: https://kroii-auto-center.onrender.com  # Update with your actual Render URL
-      
-      # Optional: Sanity CMS (uncomment if using)
-      # - key: NEXT_PUBLIC_SANITY_PROJECT_ID
-      #   sync: false
-      
-      # - key: NEXT_PUBLIC_SANITY_DATASET
-      #   value: production
-      
-      # - key: SANITY_API_TOKEN
-      #   sync: false
-      
-      # Optional: Email service (uncomment if using)
-      # - key: RESEND_API_KEY
-      #   sync: false
-    
-    # Auto-deploy on push to main branch
+        value: https://kroii-auto-center.onrender.com
+
     autoDeploy: true
-    
-    # Disk storage (if needed for uploads)
-    # disk:
-    #   name: uploads
-    #   mountPath: /var/data
-    #   sizeGB: 1

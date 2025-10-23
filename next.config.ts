@@ -1,9 +1,17 @@
 import type { NextConfig } from "next";
-import withBundleAnalyzer from "@next/bundle-analyzer";
 
-const bundleAnalyzer = withBundleAnalyzer({
-  enabled: process.env.ANALYZE === "true",
-});
+// Conditionally import bundle analyzer only in development
+let bundleAnalyzer = (config: NextConfig) => config;
+if (process.env.ANALYZE === "true") {
+  try {
+    const withBundleAnalyzer = require("@next/bundle-analyzer");
+    bundleAnalyzer = withBundleAnalyzer({
+      enabled: true,
+    });
+  } catch (e) {
+    console.warn("Bundle analyzer not available in production build");
+  }
+}
 
 // Temporarily disable PWA for build testing
 const pwa = (config: NextConfig) => config;

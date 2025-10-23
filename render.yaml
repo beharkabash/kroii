@@ -10,12 +10,10 @@ services:
     buildCommand: |
       npm install --include=dev
       npm run build
-      mkdir -p .next/standalone/public
-      mkdir -p .next/standalone/.next/static
-      cp -r public/* .next/standalone/public/
-      cp -r .next/static/* .next/standalone/.next/static/
+      cp -r public .next/standalone/kroi-auto-center/
+      cp -r .next/static .next/standalone/kroi-auto-center/.next/
 
-    startCommand: node .next/standalone/server.js
+    startCommand: cd .next/standalone/kroi-auto-center && node server.js
 
     envVars:
       - key: NODE_ENV

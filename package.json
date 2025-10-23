@@ -10,7 +10,8 @@
     "lint": "eslint",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "migrate:sanity": "tsx scripts/migrate-to-sanity.ts"
   },
   "dependencies": {
     "@sanity/client": "^6.29.1",

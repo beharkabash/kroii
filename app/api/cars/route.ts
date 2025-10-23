@@ -1,53 +1,87 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, readFile } from 'fs/promises';
-import { join } from 'path';
-import { existsSync } from 'fs';
+import { client } from '@/lib/sanity';
+import type { Car } from '@/app/data/cars';
 
-const CARS_FILE = join(process.cwd(), 'app', 'data', 'cars-dynamic.json');
-
-// GET - Read all cars
+// GET - Fetch all cars from Sanity
 export async function GET() {
   try {
-    console.log('API: Reading from:', CARS_FILE);
-    console.log('API: File exists:', existsSync(CARS_FILE));
+    console.log('API: Fetching cars from Sanity...');
     
-    const data = await readFile(CARS_FILE, 'utf-8');
-    const cars = JSON.parse(data);
-    
-    console.log('API: Found cars:', cars.length);
+    const query = `*[_type == "car"] | order(_createdAt desc) {
+      _id,
+      name,
+      slug,
+      brand,
+      model,
+      price,
+      priceEur,
+      year,
+      fuel,
+      transmission,
+      km,
+      kmNumber,
+      category,
+      description,
+      detailedDescription,
+      features,
+      "image": mainImage.asset->url,
+      "images": gallery[].asset->{
+        "url": url,
+        "altText": originalFilename,
+        order,
+        isPrimary
+      },
+      specifications,
+      condition,
+      status,
+      featured
+    }`;
+
+    const sanityCars = await client.fetch(query);
+    console.log('API: Found Sanity cars:', sanityCars.length);
+
+    // Transform Sanity data to match Car interface
+    const cars: Car[] = sanityCars.map((car: any) => ({
+      id: car.slug?.current || car._id,
+      slug: car.slug?.current || car._id,
+      name: car.name,
+      brand: car.brand,
+      model: car.model,
+      price: car.price,
+      priceEur: car.priceEur,
+      year: car.year,
+      fuel: car.fuel,
+      transmission: car.transmission,
+      km: car.km,
+      kmNumber: car.kmNumber,
+      image: car.image || '/placeholder-car.jpg',
+      description: car.description,
+      detailedDescription: car.detailedDescription || [],
+      features: car.features || [],
+      specifications: car.specifications || [],
+      condition: car.condition,
+      category: car.category,
+      status: car.status || 'available',
+      featured: car.featured || false,
+      images: car.images?.map((img: any, index: number) => ({
+        url: img.url || '/placeholder-car.jpg',
+        altText: img.altText || car.name,
+        order: img.order || index + 1,
+        isPrimary: img.isPrimary || index === 0
+      })) || []
+    }));
+
     return NextResponse.json({ success: true, cars });
   } catch (error) {
-    console.error('API: Error reading cars:', error);
-    // If file doesn't exist, return empty array
-    return NextResponse.json({ success: true, cars: [] });
+    console.error('API: Error fetching cars from Sanity:', error);
+    // Fallback to empty array on error
+    return NextResponse.json({ 
+      success: false, 
+      cars: [],
+      error: 'Failed to fetch cars from Sanity'
+    });
   }
 }
-
-// POST - Save all cars
-export async function POST(request: NextRequest) {
-  try {
-    const { cars } = await request.json();
-    
-    if (!Array.isArray(cars)) {
-      return NextResponse.json(
-        { error: 'Invalid data format' },
-        { status: 400 }
-      );
-    }
-
-    // Save to JSON file
-    await writeFile(CARS_FILE, JSON.stringify(cars, null, 2), 'utf-8');
-
-    return NextResponse.json({
-      success: true,
-      message: 'Cars saved successfully',
-      count: cars.length
-    });
-  } catch (error) {
-    console.error('Error saving cars:', error);
-    return NextResponse.json(
-      { error: 'Failed to save cars' },
-      { status: 500 }
     );
   }
 }

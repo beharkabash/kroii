@@ -8,6 +8,14 @@ export default {
   icon: () => '🚗',
   fields: [
     {
+      name: 'business',
+      title: 'Yritys / Business',
+      type: 'reference',
+      to: [{ type: 'businessInfo' }],
+      description: 'Which business this car belongs to',
+      validation: (Rule: any) => Rule.required(),
+    },
+    {
       name: 'name',
       title: 'Auton nimi (esim. BMW 318)',
       type: 'string',

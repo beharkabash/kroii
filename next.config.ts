@@ -68,9 +68,6 @@ const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
 
-  // Modern JavaScript output - enabled for smaller runtime
-  output: "standalone",
-
   // Increase timeout for static generation
   staticPageGenerationTimeout: 120,
 

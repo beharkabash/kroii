@@ -7,13 +7,9 @@ services:
     plan: starter
     branch: main
 
-    buildCommand: |
-      npm install --include=dev
-      npm run build
-      cp -r public .next/standalone/kroi-auto-center/
-      cp -r .next/static .next/standalone/kroi-auto-center/.next/
+    buildCommand: npm install --include=dev && npm run build
 
-    startCommand: cd .next/standalone/kroi-auto-center && node server.js
+    startCommand: npm start
 
     envVars:
       - key: NODE_ENV
